@@ -1,4 +1,4 @@
 #!/bin/sh
 
-source ./env_variable_example.sh
+. ./env_variables.sh
 make
