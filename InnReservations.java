@@ -69,9 +69,10 @@ public class InnReservations {
         String sql =
             " WITH occ180 AS" +
                 " (SELECT Room," +
-                    "ROUND(SUM(DATEDIFF(CheckOut,GREATEST(CheckIn,DATE_ADD(NOW(),INTERVAL -180 DAY))))/180,2) Popularity" +
+                    "ROUND(SUM(DATEDIFF(CheckOut,GREATEST(CheckIn,DATE_ADD(CURRENT_DATE(),INTERVAL -180 DAY))))/180,2) Popularity" +
                 " FROM " + reservations + 
-                " WHERE CheckOut > DATE_ADD(NOW(), INTERVAL -180 DAY)" +
+                " WHERE CheckOut > DATE_ADD(CURRENT_DATE(), INTERVAL -180 DAY)" +
+                    " AND CheckIn < NOW()" +
                 " GROUP BY Room)," +
             " recentRes AS" +
                 " (SELECT Room,DATEDIFF(MAX(CheckOut),MAX(CheckIn)) lastLength, MAX(CheckOut) lastCheckOut" +
@@ -103,7 +104,7 @@ public class InnReservations {
             String pop = "Popularity";
             String lastLen = "lastLength";
             String lastCheckOut = "lastCheckOut";
-            System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %-10s | %10s | %12s\n",
+            System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %10s | %12s\n",
                 rc,rn,beds,bedType,maxOcc,basePrice,decor,pop,lastLen,lastCheckOut);
             while (rs.next()) {
                 String Rc = rs.getString(rc);
@@ -116,7 +117,7 @@ public class InnReservations {
                 float popularity = rs.getFloat(pop);
                 int LastLen = rs.getInt(lastLen);
                 String LastCheckOut = rs.getString(lastCheckOut);
-                System.out.format("%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %-10s | %10s | %12s\n",
+                System.out.format("%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %10s | %12s\n",
                     Rc,Rn,Beds,BedType,MaxOcc,BasePrice,Decor,popularity,LastLen,LastCheckOut);
             }
         }
