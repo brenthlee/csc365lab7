@@ -78,45 +78,55 @@ public class InnReservations {
                 " JOIN recentRes res ON res.Room=r.RoomCode" +
             " ORDER BY Popularity DESC;";
         try {
-            connectFR1(sql);
+            executeFR1(sql);
         } catch (SQLException e) {
             throw new SQLException(e);
         }
     }
 
-    public void connectFR1(String sql) throws SQLException {
+    public void executeFR1(String sql) throws SQLException {
+        Connection connection = connect();
+        try (Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
+            String rc = "RoomCode";
+            String rn = "RoomName";
+            String beds = "Beds";
+            String bedType = "bedType";
+            String maxOcc = "maxOcc";
+            String basePrice = "basePrice";
+            String decor = "decor";
+            String pop = "Popularity";
+            String lastLen = "lastLength";
+            String lastCheckOut = "lastCheckOut";
+            System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %-10s | %10s | %12s\n",
+                rc,rn,beds,bedType,maxOcc,basePrice,decor,pop,lastLen,lastCheckOut);
+            while (rs.next()) {
+                String Rc = rs.getString(rc);
+                String Rn = rs.getString(rn);
+                int Beds = rs.getInt(beds);
+                String BedType = rs.getString(bedType);
+                int MaxOcc = rs.getInt(maxOcc);
+                int BasePrice = rs.getInt(basePrice);
+                String Decor = rs.getString(decor);
+                float popularity = rs.getFloat(pop);
+                int LastLen = rs.getInt(lastLen);
+                String LastCheckOut = rs.getString(lastCheckOut);
+                System.out.format("%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %-10s | %10s | %12s\n",
+                    Rc,Rn,Beds,BedType,MaxOcc,BasePrice,Decor,popularity,LastLen,LastCheckOut);
+            }
+        }
+        System.out.println("");
+    }
+
+    public void funcReq2() throws SQLException {
+    }
+    public void executeFR2(String sql) throws SQLException {
+    }
+
+    public Connection connect() throws SQLException {
         try {
             Connection connection = DriverManager.getConnection(url, name, pass);
-            try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
-                String rc = "RoomCode";
-                String rn = "RoomName";
-                String beds = "Beds";
-                String bedType = "bedType";
-                String maxOcc = "maxOcc";
-                String basePrice = "basePrice";
-                String decor = "decor";
-                String pop = "Popularity";
-                String lastLen = "lastLength";
-                String lastCheckOut = "lastCheckOut";
-                System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %-10s | %10s | %12s\n",
-                    rc,rn,beds,bedType,maxOcc,basePrice,decor,pop,lastLen,lastCheckOut);
-                while (rs.next()) {
-                    String Rc = rs.getString(rc);
-                    String Rn = rs.getString(rn);
-                    int Beds = rs.getInt(beds);
-                    String BedType = rs.getString(bedType);
-                    int MaxOcc = rs.getInt(maxOcc);
-                    int BasePrice = rs.getInt(basePrice);
-                    String Decor = rs.getString(decor);
-                    float popularity = rs.getFloat(pop);
-                    int LastLen = rs.getInt(lastLen);
-                    String LastCheckOut = rs.getString(lastCheckOut);
-                    System.out.format("%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %-10s | %10s | %12s\n",
-                        Rc,Rn,Beds,BedType,MaxOcc,BasePrice,Decor,popularity,LastLen,LastCheckOut);
-                }
-            }
-            System.out.println("");
+            return connection;
         } finally {}
     }
 }
