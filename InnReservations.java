@@ -11,9 +11,14 @@ public class InnReservations {
     public static void main(String[] args) throws SQLException {
         try {
             InnReservations IR = new InnReservations();
-            url = "jdbc:mysql://db.labthreesixfive.com/blee96?autoReconnect=true&useSSL=false";
-            name = "blee96";
-            pass = "WinterTwenty20_365_011115373";
+            // // TO-DO
+            // // Implement environment variables for login.
+            url = System.getenv("APP_JDBC_URL");
+            name = System.getenv("APP_JDBC_USER");
+            pass = System.getenv("APP_JDBC_PW");
+            // url = "jdbc:mysql://db.labthreesixfive.com/blee96?autoReconnect=true&useSSL=false";
+            // name = "blee96";
+            // pass = "WinterTwenty20_365_011115373";
             while (true) {
                 IR.prompt();
             }
