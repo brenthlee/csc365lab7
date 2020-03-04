@@ -12,3 +12,5 @@ Contributors: **Brent Lee, Henry Luengas, Ryan Nevils**
     * using table created in blee96
 
     * GRANT ALL ON [lab7_reservations|lab7_rooms] TO [hluengas|rnevils];
+
+    * Set Environment Variables: [APP_JDBC_URL, APP_JDBC_USER, APP_JDBC_PW]
