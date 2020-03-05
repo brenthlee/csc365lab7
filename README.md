@@ -5,7 +5,7 @@ Contributors: **Brent Lee, Henry Luengas, Ryan Nevils**
 
 ## How to run: ##
 
-    To compile and start the program, just type 'make'
+    To compile and start the program, just type './run.sh'
 
 ## Setup: ##
     
