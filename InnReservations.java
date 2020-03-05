@@ -5,8 +5,8 @@ public class InnReservations {
     static String url;
     static String name;
     static String pass;
-    static final String rooms = "blee96.lab7_rooms";
-    static final String reservations = "blee96.lab7_reservations";
+    static final String rooms = "blee96.lab7_rooms r";
+    static final String reservations = "blee96.lab7_reservations res";
 
     public static void main(String[] args) throws SQLException {
         try {
@@ -74,14 +74,30 @@ public class InnReservations {
                 " WHERE CheckOut > DATE_ADD(CURRENT_DATE(), INTERVAL -180 DAY)" +
                     " AND CheckIn < NOW()" +
                 " GROUP BY Room)," +
+            " nextAvail AS" +
+                "(with r1 as " +
+                    " (select RoomName, CheckIn, CheckOut"+
+                    " from " + rooms + ", " + reservations +
+                    " where r.RoomCode = res.Room),"+
+                    " r2 as (select fir.RoomName as room,"+
+                        " DATEDIFF(sec.CheckIn, fir.CheckOut) as diff,"+
+                        " fir.CheckOut as checkout, sec.CheckIn as checkin,"+
+                        " rank() over (partition by fir.RoomName order by checkout,"+
+                        " DATEDIFF(sec.CheckIn, fir.CheckOut) asc) as RANKING"+
+                    " FROM r1 fir JOIN r1 sec ON fir.RoomName=sec.RoomName"+
+                    " WHERE fir.Checkout < sec.CheckIn AND fir.CheckOut > NOW())"+
+                " SELECT Room, CheckOut NextAvailable" +
+                //" select room, DATE_ADD(checkout, INTERVAL 1 DAY) as Next_Available"
+                " FROM r2 WHERE RANKING = 1 ORDER BY room)," +
             " recentRes AS" +
                 " (SELECT Room,DATEDIFF(MAX(CheckOut),MAX(CheckIn)) lastLength, MAX(CheckOut) lastCheckOut" +
                 " FROM " + reservations +
                 " WHERE CheckOut <= NOW()" +
                 " GROUP BY Room)" +
-            " SELECT r.*, Popularity, lastLength, lastCheckOut" +
-            " FROM occ180 occ JOIN " + rooms + " r ON RoomCode=occ.Room" +
+            " SELECT r.*, Popularity, NextAvailable, lastLength lastStayLength, lastCheckOut" +
+            " FROM occ180 occ JOIN " + rooms + " ON RoomCode=occ.Room" +
                 " JOIN recentRes res ON res.Room=r.RoomCode" +
+                " JOIN nextAvail n ON res.Room=n.Room" +
             " ORDER BY Popularity DESC;";
         try {
             executeFR1(sql);
@@ -91,8 +107,8 @@ public class InnReservations {
     }
 
     public void executeFR1(String sql) throws SQLException {
-        Connection connection = connect();
-        try (Statement stmt = connection.createStatement();
+        Connection conn = connect();
+        try (Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql)) {
             String rc = "RoomCode";
             String rn = "RoomName";
@@ -102,10 +118,11 @@ public class InnReservations {
             String basePrice = "basePrice";
             String decor = "decor";
             String pop = "Popularity";
-            String lastLen = "lastLength";
+            String lastLen = "lastStayLength";
             String lastCheckOut = "lastCheckOut";
-            System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %10s | %12s\n",
-                rc,rn,beds,bedType,maxOcc,basePrice,decor,pop,lastLen,lastCheckOut);
+            String nextAvail = "NextAvailable";
+            System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %14s | %12s | %13s\n",
+                rc,rn,beds,bedType,maxOcc,basePrice,decor,pop,lastLen,lastCheckOut,nextAvail);
             while (rs.next()) {
                 String Rc = rs.getString(rc);
                 String Rn = rs.getString(rn);
@@ -117,22 +134,25 @@ public class InnReservations {
                 float popularity = rs.getFloat(pop);
                 int LastLen = rs.getInt(lastLen);
                 String LastCheckOut = rs.getString(lastCheckOut);
-                System.out.format("%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %10s | %12s\n",
-                    Rc,Rn,Beds,BedType,MaxOcc,BasePrice,Decor,popularity,LastLen,LastCheckOut);
+                System.out.format("%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %14s | %12s | %13s\n",
+                    Rc,Rn,Beds,BedType,MaxOcc,BasePrice,Decor,popularity,LastLen,LastCheckOut,nextAvail);
             }
         }
         System.out.println("");
     }
 
     public void funcReq2() throws SQLException {
+        //String sql =
+        //;
     }
     public void executeFR2(String sql) throws SQLException {
+        Connection conn = connect();
     }
 
     public Connection connect() throws SQLException {
         try {
-            Connection connection = DriverManager.getConnection(url, name, pass);
-            return connection;
+            Connection conn = DriverManager.getConnection(url, name, pass);
+            return conn;
         } finally {}
     }
 }
