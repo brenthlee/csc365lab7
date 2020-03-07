@@ -135,16 +135,16 @@ public class InnReservations {
         // ;
     }
 
-    public void executeFR2(String sql) throws SQLException{
+    public void executeFR2(String sql) throws SQLException {
         Connection dbConnection = connect();
     }
 
-    public void funcReq3() throws SQLException 
-    {
+    public void funcReq3() throws SQLException {
         // Setup
         Scanner scanner = new Scanner(System.in);
         Connection dbConnection = connect();
-        
+        dbConnection.setAutoCommit(false);
+
         // reservationExistsQuery
         PreparedStatement reservationExistsQuery;
         ResultSet reservationExistsResult;
@@ -163,154 +163,159 @@ public class InnReservations {
         ResultSet ovelapReservationResults;
         boolean ovelapReservation = false;
 
+        PreparedStatement updateReservationQuery;
+        int updateRowsCount = 0;
+
         // Get Reservation Number User Input
         System.out.println("Request Reservation Change");
         System.out.println("Enter your reservation code:");
-        if (scanner.hasNextInt()) 
-        {
+        if (scanner.hasNextInt()) {
             reservationCode = scanner.nextInt();
         }
-        if (reservationCode == 0)
-        {
+        if (reservationCode == 0) {
             System.out.println("[Error] Invalid Entry");
+            scanner.close();
             return;
         }
 
         // Prepare reservation existance query
-        reservationExistsQuery = dbConnection.prepareStatement("select true as valid, Room, CheckIn, CheckOut, LastName, FirstName, Adults, Kids from lab7_reservations where Code = ?");
+        reservationExistsQuery = dbConnection.prepareStatement(
+                "select true as valid, Room, CheckIn, CheckOut, LastName, FirstName, Adults, Kids from lab7_reservations where Code = ?");
         reservationExistsQuery.setInt(1, reservationCode);
 
         // Perform reservation existance query
-        try
-        {
+        try {
             reservationExistsResult = reservationExistsQuery.executeQuery();
-            while (reservationExistsResult.next())
-            {
+            while (reservationExistsResult.next()) {
                 validResrvation = reservationExistsResult.getBoolean("valid");
                 roomCode = reservationExistsResult.getString("Room");
-                checkIn = reservationExistsResult.getDate("CheckIn");
-                checkOut = reservationExistsResult.getDate("CheckOut");
+                checkIn = reservationExistsResult.getDate("CheckIn", java.util.Calendar.getInstance());
+                checkOut = reservationExistsResult.getDate("CheckOut", java.util.Calendar.getInstance());
                 lastName = reservationExistsResult.getString("LastName");
                 firstName = reservationExistsResult.getString("FirstName");
                 numAdults = reservationExistsResult.getInt("Adults");
                 numKids = reservationExistsResult.getInt("Kids");
-                
+
             }
-        } catch (SQLException e)
-        {
-            // TearDown
+        } catch (SQLException e) {
+            dbConnection.rollback();
+            dbConnection.close();
             scanner.close();
-            throw new SQLException(e);
+            e.printStackTrace();
         }
 
         // If Valid check dates
-        if (validResrvation)
-        {
-            System.out.println(roomCode);
+        if (validResrvation) {
 
             // Allow Spaces
             scanner.useDelimiter("\n");
-            
+
             // Get updated info from user
             System.out.println("Enter 'no change' or updated first name:");
             tempInput = scanner.next();
-            if (!tempInput.equals("no change"))
-            {
+            if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 firstName = tempInput;
             }
 
             // Get updated info from user
             System.out.println("Enter 'no change' or updated last name:");
             tempInput = scanner.next();
-            if (!tempInput.equals("no change"))
-            {
+            if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 lastName = tempInput;
             }
 
             // Get updated info from user
             System.out.println("Enter 'no change' or updated check-in date:");
             tempInput = scanner.next();
-            if (!tempInput.equals("no change"))
-            {
+            if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 checkIn = java.sql.Date.valueOf(tempInput);
             }
 
             // Get updated info from user
             System.out.println("Enter 'no change' or updated check-out date:");
             tempInput = scanner.next();
-            if (!tempInput.equals("no change"))
-            {
+            if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 checkOut = java.sql.Date.valueOf(tempInput);
             }
 
             // Get updated info from user
             System.out.println("Enter 'no change' or updated number of children:");
             tempInput = scanner.next();
-            if (!tempInput.equals("no change"))
-            {
+            if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 numKids = Integer.parseInt(tempInput);
             }
 
             // Get updated info from user
             System.out.println("Enter 'no change' or updated number of adults");
             tempInput = scanner.next();
-            if (!tempInput.equals("no change"))
-            {
+            if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 numAdults = Integer.parseInt(tempInput);
             }
 
-            ovelapReservationQuery = dbConnection.prepareStatement(
-                "select true as overlap " + 
-                "from lab7_reservations " + 
-                "where Room like ? " +
-                "and (CheckIn >= ? and CheckIn <= ? or CheckOut > ? and CheckOut <= ?) " +
-                "and not (CheckIn = ? and CheckOut = ?)"
-            );
+            ovelapReservationQuery = dbConnection.prepareStatement("select true as overlap " + "from lab7_reservations "
+                    + "where (Room like ? ) and ((CheckIn >= ? and CheckIn < ? ) or (CheckOut > ? and CheckOut <= ? )) "
+                    + "and code <> ?");
             ovelapReservationQuery.setString(1, roomCode);
-            ovelapReservationQuery.setDate(2, checkIn);
-            ovelapReservationQuery.setDate(3, checkOut);
-            ovelapReservationQuery.setDate(4, checkIn);
-            ovelapReservationQuery.setDate(5, checkOut);
-            ovelapReservationQuery.setDate(6, checkIn);
-            ovelapReservationQuery.setDate(7, checkOut);
+            ovelapReservationQuery.setDate(2, checkIn, java.util.Calendar.getInstance());
+            ovelapReservationQuery.setDate(3, checkOut, java.util.Calendar.getInstance());
+            ovelapReservationQuery.setDate(4, checkIn, java.util.Calendar.getInstance());
+            ovelapReservationQuery.setDate(5, checkOut, java.util.Calendar.getInstance());
+            ovelapReservationQuery.setInt(6, reservationCode);
 
             // Perform reservation existance query
-            try
-            {
+            try {
                 ovelapReservationResults = ovelapReservationQuery.executeQuery();
-                while (ovelapReservationResults.next())
-                {
+                while (ovelapReservationResults.next()) {
                     ovelapReservation = ovelapReservationResults.getBoolean("overlap");
                 }
-            } catch (SQLException e)
-            {
-                // TearDown
+            } catch (SQLException e) {
+                dbConnection.rollback();
+                dbConnection.close();
                 scanner.close();
-                throw new SQLException(e);
+                e.printStackTrace();
             }
 
-            if(ovelapReservation)
-            {
-                System.out.println("Overlap Detected");
-            }
-            else
-            {
+            if (ovelapReservation) {
+                System.out.println("New reservation dates overlap with an existing reservation.");
+                System.out.println("Reservation update Failed...");
+            } else {
                 System.out.println("No Overlap Detected");
+                updateReservationQuery = dbConnection.prepareStatement("update lab7_reservations "
+                        + "set CheckIn = ?, CheckOut = ?, LastName = ?, FirstName = ?, Adults = ?, Kids = ? "
+                        + "where code = ?");
+                updateReservationQuery.setDate(1, checkIn, java.util.Calendar.getInstance());
+                updateReservationQuery.setDate(2, checkOut, java.util.Calendar.getInstance());
+                updateReservationQuery.setString(3, lastName);
+                updateReservationQuery.setString(4, firstName);
+                updateReservationQuery.setInt(5, numAdults);
+                updateReservationQuery.setInt(6, numKids);
+                updateReservationQuery.setInt(7, reservationCode);
+
+                // Perform reservation update
+                try {
+                    updateRowsCount = updateReservationQuery.executeUpdate();
+                    dbConnection.commit();
+                } catch (SQLException e) {
+                    dbConnection.rollback();
+                    dbConnection.close();
+                    scanner.close();
+                    e.printStackTrace();
+                }
+                System.out.println(String.valueOf(updateRowsCount) + " reservations updated with the following:");
+                System.out.println("reservationCode: " + String.valueOf(reservationCode));
+                System.out.println("checkIn: " + checkIn.toString());
+                System.out.println("checkOut: " + checkOut.toString());
+                System.out.println("lastName: " + lastName);
+                System.out.println("firstName: " + firstName);
+                System.out.println("adults: " + String.valueOf(numAdults));
+                System.out.println("kids: " + String.valueOf(numKids));
             }
-            
-        } 
-        else
-        {
+        } else {
             System.out.println("Reservation Code Not Valid, Update Failed...");
         }
 
-
-
-        
-
-        
-
         // TearDown
+        dbConnection.close();
         scanner.close();
     }
 
