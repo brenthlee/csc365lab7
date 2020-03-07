@@ -206,6 +206,8 @@ public class InnReservations {
         // If Valid check dates
         if (validResrvation)
         {
+            System.out.println(roomCode);
+
             // Allow Spaces
             scanner.useDelimiter("\n");
             
@@ -258,16 +260,19 @@ public class InnReservations {
             }
 
             ovelapReservationQuery = dbConnection.prepareStatement(
-                "select true as overlap" + 
-                "from lab7_reservations" + 
+                "select true as overlap " + 
+                "from lab7_reservations " + 
                 "where Room like ? " +
-                "and ((CheckIn between ? and ?) or (CheckOut between ? and ?))"
+                "and (CheckIn >= ? and CheckIn <= ? or CheckOut > ? and CheckOut <= ?) " +
+                "and not (CheckIn = ? and CheckOut = ?)"
             );
             ovelapReservationQuery.setString(1, roomCode);
             ovelapReservationQuery.setDate(2, checkIn);
             ovelapReservationQuery.setDate(3, checkOut);
             ovelapReservationQuery.setDate(4, checkIn);
             ovelapReservationQuery.setDate(5, checkOut);
+            ovelapReservationQuery.setDate(6, checkIn);
+            ovelapReservationQuery.setDate(7, checkOut);
 
             // Perform reservation existance query
             try
@@ -287,6 +292,10 @@ public class InnReservations {
             if(ovelapReservation)
             {
                 System.out.println("Overlap Detected");
+            }
+            else
+            {
+                System.out.println("No Overlap Detected");
             }
             
         } 
