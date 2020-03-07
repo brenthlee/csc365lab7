@@ -32,7 +32,7 @@ public class InnReservations {
     }
 
     public void prompt() throws SQLException {
-        funcReq3();
+        funcReq1();
         System.exit(0);
         // int choice = -1;
         // String statement = "";
@@ -139,6 +139,7 @@ public class InnReservations {
         Connection dbConnection = connect();
     }
 
+    // update reservation
     public void funcReq3() throws SQLException {
         // Setup
         Scanner scanner = new Scanner(System.in);
@@ -211,42 +212,42 @@ public class InnReservations {
             scanner.useDelimiter("\n");
 
             // Get updated info from user
-            System.out.println("Enter 'no change' or updated first name:");
+            System.out.println("Enter updated first name (leave blank or enter \"no change\" to skip):");
             tempInput = scanner.next();
             if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 firstName = tempInput;
             }
 
             // Get updated info from user
-            System.out.println("Enter 'no change' or updated last name:");
+            System.out.println("Enter updated last name (leave blank or enter \"no change\" to skip):");
             tempInput = scanner.next();
             if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 lastName = tempInput;
             }
 
             // Get updated info from user
-            System.out.println("Enter 'no change' or updated check-in date:");
+            System.out.println("Enter updated check-in date (leave blank or enter \"no change\" to skip):");
             tempInput = scanner.next();
             if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 checkIn = java.sql.Date.valueOf(tempInput);
             }
 
             // Get updated info from user
-            System.out.println("Enter 'no change' or updated check-out date:");
+            System.out.println("Enter updated check-out date (leave blank or enter \"no change\" to skip):");
             tempInput = scanner.next();
             if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 checkOut = java.sql.Date.valueOf(tempInput);
             }
 
             // Get updated info from user
-            System.out.println("Enter 'no change' or updated number of children:");
+            System.out.println("Enter updated number of children (leave blank or enter \"no change\" to skip):");
             tempInput = scanner.next();
             if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 numKids = Integer.parseInt(tempInput);
             }
 
             // Get updated info from user
-            System.out.println("Enter 'no change' or updated number of adults");
+            System.out.println("Enter updated number of adults (leave blank or enter \"no change\" to skip):");
             tempInput = scanner.next();
             if (!tempInput.equals("no change") && !tempInput.equals("")) {
                 numAdults = Integer.parseInt(tempInput);
@@ -319,8 +320,94 @@ public class InnReservations {
         scanner.close();
     }
 
-    public void executeFR3() throws SQLException {
+    // cancel reservation
+    public void funcReq4() throws SQLException {
+        // Setup
+        Scanner scanner = new Scanner(System.in);
+        Connection dbConnection = connect();
+        dbConnection.setAutoCommit(false);
 
+        // reservationExistsQuery
+        PreparedStatement reservationExistsQuery;
+        ResultSet reservationExistsResult;
+        boolean validResrvation = false;
+        int reservationCode = 0;
+        String tempInput = "";
+
+        PreparedStatement cancelReservationQuery;
+        int updateRowsCount = 0;
+
+        // Get Reservation Number User Input
+        System.out.println("Request Reservation Cancelation");
+        System.out.println("Enter your reservation code:");
+        if (scanner.hasNextInt()) {
+            reservationCode = scanner.nextInt();
+        }
+        if (reservationCode == 0) {
+            System.out.println("[Error] Invalid Entry");
+            scanner.close();
+            return;
+        }
+
+        // Prepare reservation existance query
+        reservationExistsQuery = dbConnection
+                .prepareStatement("select true as valid from lab7_reservations where Code = ?");
+        reservationExistsQuery.setInt(1, reservationCode);
+
+        // Perform reservation existance query
+        try {
+            reservationExistsResult = reservationExistsQuery.executeQuery();
+            while (reservationExistsResult.next()) {
+                validResrvation = reservationExistsResult.getBoolean("valid");
+            }
+        } catch (SQLException e) {
+            dbConnection.rollback();
+            dbConnection.close();
+            scanner.close();
+            e.printStackTrace();
+        }
+
+        // If Valid check dates
+        if (validResrvation) {
+            System.out.println("Reservation Found. Are you sure you would like to cancel reservation: "
+                    + String.valueOf(reservationCode) + "?");
+            System.out.println("Enter \"yes\" or \"y\" to confirm cancelation.");
+
+            // Allow Spaces
+            scanner.useDelimiter("\n");
+
+            // Get updated info from user
+            tempInput = scanner.next();
+            if (tempInput.toUpperCase().equals("YES") || tempInput.toUpperCase().equals("Y")) {
+
+                cancelReservationQuery = dbConnection.prepareStatement("delete from lab7_reservations where code = ?");
+                cancelReservationQuery.setInt(1, reservationCode);
+
+                try {
+                    updateRowsCount = cancelReservationQuery.executeUpdate();
+                    System.out.println(String.valueOf(updateRowsCount) + " reservation(s) canceled: " + String.valueOf(reservationCode));
+                    
+                    // change to commit when testing is done
+                    dbConnection.rollback();
+                } catch (SQLException e) {
+                    dbConnection.rollback();
+                    dbConnection.close();
+                    scanner.close();
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                System.out.println("The reservation was not canceled.");
+                dbConnection.rollback();
+            }
+
+        } else {
+            System.out.println("Reservation not found.");
+            dbConnection.rollback();
+        }
+        dbConnection.close();
+        scanner.close();
     }
 
     public Connection connect() throws SQLException {
