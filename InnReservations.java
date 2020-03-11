@@ -5,8 +5,8 @@ public class InnReservations {
     static String url;
     static String name;
     static String pass;
-    static final String rooms = "blee96.lab7_rooms r";
-    static final String reservations = "blee96.lab7_reservations res";
+    static final String rooms = "blee96.lab7_rooms";
+    static final String reservations = "blee96.lab7_reservations";
 
     public static void main(String[] args) throws SQLException {
         try {
@@ -95,7 +95,7 @@ public class InnReservations {
                 " WHERE CheckOut <= NOW()" +
                 " GROUP BY Room)" +
             " SELECT r.*, Popularity, NextAvailable, lastLength lastStayLength, lastCheckOut" +
-            " FROM occ180 occ JOIN " + rooms + " ON RoomCode=occ.Room" +
+            " FROM occ180 occ JOIN " + rooms + " r ON RoomCode=occ.Room" +
                 " JOIN recentRes res ON res.Room=r.RoomCode" +
                 " JOIN nextAvail n ON res.Room=n.Room" +
             " ORDER BY Popularity DESC;";
@@ -142,11 +142,42 @@ public class InnReservations {
     }
 
     public void funcReq2() throws SQLException {
-        //String sql =
-        //;
+        String sql =
+            " SELECT RoomCode, RoomName, Beds, bedType, maxOcc, basePrice, decor, ROW_NUMBER() OVER () AS Opt" +
+            " FROM " + rooms + " r"
+            " WHERE RoomCode NOT IN" +
+                " (SELECT DISTINCT R.RoomCode" +
+                " FROM " + rooms + " R" +
+                " INNER JOIN " + reservations + " res ON res.Room=R.RoomCode" +
+                " WHERE "
     }
+
     public void executeFR2(String sql) throws SQLException {
         Connection conn = connect();
+        System.out.println("MAKE A RESERVATION");
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Enter your first name: ");
+        String fn = scan.next();
+        System.out.println("Enter your last name: ");
+        String ln = scan.next();
+        System.out.println("Enter a room code or type Any: ");
+        String rc = scan.next();
+        System.out.println("Enter a bed type or type Any: ");
+        String bt = scan.next();
+        System.out.println("Enter a check-in date (YYYY-MM-DD): ");
+        String ci = scan.next();
+        System.out.println("Enter a check-out date (YYYY-MM-DD): ");
+        String co = scan.next();
+        int nc, na;
+        do {
+            System.out.println("Enter the number of children: ");
+            nc = scan.nextInt();
+            System.out.println("Enter the number of adults: ");
+            na = scan.nextInt();
+            if (nc + na > 4) {
+                System.println("The total number of people per reservation is 4.\nPlease break up your group and make separate reservations.");
+            }
+        } while (nc + na >  4);
     }
 
     public Connection connect() throws SQLException {
