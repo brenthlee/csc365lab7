@@ -5,8 +5,8 @@ public class InnReservations {
     static String url;
     static String name;
     static String pass;
-    static final String rooms = "blee96.lab7_rooms r";
-    static final String reservations = "blee96.lab7_reservations res";
+    static final String rooms = "blee96.lab7_rooms";
+    static final String reservations = "blee96.lab7_reservations";
 
     public static void main(String[] args) throws SQLException {
         try {
@@ -69,26 +69,39 @@ public class InnReservations {
     }
 
     public void funcReq1() throws SQLException {
-        String sql = " WITH occ180 AS" + " (SELECT Room,"
-                + "ROUND(SUM(DATEDIFF(CheckOut,GREATEST(CheckIn,DATE_ADD(CURRENT_DATE(),INTERVAL -180 DAY))))/180,2) Popularity"
-                + " FROM " + reservations + " WHERE CheckOut > DATE_ADD(CURRENT_DATE(), INTERVAL -180 DAY)"
-                + " AND CheckIn < NOW()" + " GROUP BY Room)," + " nextAvail AS" + "(with r1 as "
-                + " (select RoomName, CheckIn, CheckOut" + " from " + rooms + ", " + reservations
-                + " where r.RoomCode = res.Room)," + " r2 as (select fir.RoomName as room,"
-                + " DATEDIFF(sec.CheckIn, fir.CheckOut) as diff," + " fir.CheckOut as checkout, sec.CheckIn as checkin,"
-                + " rank() over (partition by fir.RoomName order by checkout,"
-                + " DATEDIFF(sec.CheckIn, fir.CheckOut) asc) as RANKING"
-                + " FROM r1 fir JOIN r1 sec ON fir.RoomName=sec.RoomName"
-                + " WHERE fir.Checkout < sec.CheckIn AND fir.CheckOut > NOW())" + " SELECT Room, CheckOut NextAvailable"
-                +
-                // " select room, DATE_ADD(checkout, INTERVAL 1 DAY) as Next_Available"
-                " FROM r2 WHERE RANKING = 1 ORDER BY room)," + " recentRes AS"
-                + " (SELECT Room,DATEDIFF(MAX(CheckOut),MAX(CheckIn)) lastLength, MAX(CheckOut) lastCheckOut" + " FROM "
-                + reservations + " WHERE CheckOut <= NOW()" + " GROUP BY Room)"
-                + " SELECT r.*, Popularity, NextAvailable, lastLength lastStayLength, lastCheckOut"
-                + " FROM occ180 occ JOIN " + rooms + " ON RoomCode=occ.Room"
-                + " JOIN recentRes res ON res.Room=r.RoomCode" + " JOIN nextAvail n ON res.Room=n.Room"
-                + " ORDER BY Popularity DESC;";
+        String sql =
+            " WITH occ180 AS" +
+                " (SELECT Room," +
+                    "ROUND(SUM(DATEDIFF(CheckOut,GREATEST(CheckIn,DATE_ADD(CURRENT_DATE(),INTERVAL -180 DAY))))/180,2) Popularity" +
+                " FROM " + reservations + 
+                " WHERE CheckOut > DATE_ADD(CURRENT_DATE(), INTERVAL -180 DAY)" +
+                    " AND CheckIn < NOW()" +
+                " GROUP BY Room)," +
+            " nextAvail AS" +
+                "(with r1 as " +
+                    " (select RoomName, CheckIn, CheckOut"+
+                    " from " + rooms + ", " + reservations +
+                    " where r.RoomCode = res.Room),"+
+                    " r2 as (select fir.RoomName as room,"+
+                        " DATEDIFF(sec.CheckIn, fir.CheckOut) as diff,"+
+                        " fir.CheckOut as checkout, sec.CheckIn as checkin,"+
+                        " rank() over (partition by fir.RoomName order by checkout,"+
+                        " DATEDIFF(sec.CheckIn, fir.CheckOut) asc) as RANKING"+
+                    " FROM r1 fir JOIN r1 sec ON fir.RoomName=sec.RoomName"+
+                    " WHERE fir.Checkout < sec.CheckIn AND fir.CheckOut > NOW())"+
+                " SELECT Room, CheckOut NextAvailable" +
+                //" select room, DATE_ADD(checkout, INTERVAL 1 DAY) as Next_Available"
+                " FROM r2 WHERE RANKING = 1 ORDER BY room)," +
+            " recentRes AS" +
+                " (SELECT Room,DATEDIFF(MAX(CheckOut),MAX(CheckIn)) lastLength, MAX(CheckOut) lastCheckOut" +
+                " FROM " + reservations +
+                " WHERE CheckOut <= NOW()" +
+                " GROUP BY Room)" +
+            " SELECT r.*, Popularity, NextAvailable, lastLength lastStayLength, lastCheckOut" +
+            " FROM occ180 occ JOIN " + rooms + " r ON RoomCode=occ.Room" +
+                " JOIN recentRes res ON res.Room=r.RoomCode" +
+                " JOIN nextAvail n ON res.Room=n.Room" +
+            " ORDER BY Popularity DESC;";
         try {
             executeFR1(sql);
         } catch (SQLException e) {
@@ -136,7 +149,31 @@ public class InnReservations {
     }
 
     public void executeFR2(String sql) throws SQLException {
-        Connection dbConnection = connect();
+        Connection conn = connect();
+        System.out.println("MAKE A RESERVATION");
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Enter your first name: ");
+        String fn = scan.next();
+        System.out.println("Enter your last name: ");
+        String ln = scan.next();
+        System.out.println("Enter a room code or type Any: ");
+        String rc = scan.next();
+        System.out.println("Enter a bed type or type Any: ");
+        String bt = scan.next();
+        System.out.println("Enter a check-in date (YYYY-MM-DD): ");
+        String ci = scan.next();
+        System.out.println("Enter a check-out date (YYYY-MM-DD): ");
+        String co = scan.next();
+        int nc, na;
+        do {
+            System.out.println("Enter the number of children: ");
+            nc = scan.nextInt();
+            System.out.println("Enter the number of adults: ");
+            na = scan.nextInt();
+            if (nc + na > 4) {
+                System.println("The total number of people per reservation is 4.\nPlease break up your group and make separate reservations.");
+            }
+        } while (nc + na >  4);
     }
 
     // update reservation
@@ -408,7 +445,17 @@ public class InnReservations {
         }
         dbConnection.close();
         scanner.close();
+        String sql =
+            " SELECT RoomCode, RoomName, Beds, bedType, maxOcc, basePrice, decor, ROW_NUMBER() OVER () AS Opt" +
+            " FROM " + rooms + " r"
+            " WHERE RoomCode NOT IN" +
+                " (SELECT DISTINCT R.RoomCode" +
+                " FROM " + rooms + " R" +
+                " INNER JOIN " + reservations + " res ON res.Room=R.RoomCode" +
+                " WHERE "
     }
+
+    
 
     public Connection connect() throws SQLException {
         try {
