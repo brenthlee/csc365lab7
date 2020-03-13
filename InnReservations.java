@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.*;
+import java.time.LocalDate;
 
 public class InnReservations {
     static String url;
@@ -32,7 +33,7 @@ public class InnReservations {
     }
 
     public void prompt() throws SQLException {
-        funcReq3();
+        funcReq5();
         System.exit(0);
         // int choice = -1;
         // String statement = "";
@@ -445,6 +446,106 @@ public class InnReservations {
         }
         dbConnection.close();
         scanner.close();
+    }
+
+    // Detailed Reservation Information
+    public void funcReq5() throws SQLException {
+        String tempInput = "";
+        
+        // Step 1: Establish connection to RDBMS
+        try (Connection dbConnection = DriverManager.getConnection(url, name, pass)) {
+
+            // Step 2: Construct SQL statement
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Detailed Reservation Information \n");
+
+            System.out.print("Enter a first name: ");
+            String fname = "%";
+            String tempString = scanner.nextLine();
+            if (!tempString.equals("")){
+                fname = tempString;
+            }
+
+            System.out.print("Enter a last name: ");
+            String lname = "%";
+            tempString = scanner.nextLine();
+            if (!tempString.equals("")){
+                lname = tempString;
+            }
+
+            System.out.print("Enter a room code: ");
+            String rcode = "%";
+            tempString = scanner.nextLine();
+            if (!tempString.equals("")){
+                rcode = tempString;
+            }
+
+            System.out.print("Enter a reservation code: ");
+            String rescode = "%";
+            tempString = scanner.nextLine();
+            if (!tempString.equals("")){
+                rescode = tempString;
+            }
+
+            System.out.print("Enter a start date (YYYY-MM-DD): ");
+            String sdate = "1900-01-01";
+            tempString = scanner.nextLine();
+            if (!tempString.equals("")) {
+                sdate = tempString;
+            }
+
+            System.out.print("Enter an end date (YYYY-MM-DD): ");
+            String edate = "2100-01-01";
+            tempString = scanner.nextLine();
+            if (!tempString.equals("")) {
+                edate = tempString;
+            }
+            
+
+            String searchSql = "SELECT * FROM lab7_reservations, lab7_rooms WHERE RoomCode = Room AND FirstName like ? AND LastName like ? AND Room like ? AND Code like ? AND CheckIn BETWEEN ? AND ? AND CheckOut BETWEEN ? AND ?";
+
+            // Step 3: Start transaction
+            dbConnection.setAutoCommit(false);
+
+            try (PreparedStatement pstmt = dbConnection.prepareStatement(searchSql)) {
+                    
+                // Step 4: Send SQL statement to DBMS
+                pstmt.setString(1, fname);
+                pstmt.setString(2, lname);
+                pstmt.setString(3, rcode);
+                pstmt.setString(4, rescode);
+                pstmt.setDate(5, java.sql.Date.valueOf(sdate));
+                pstmt.setDate(6, java.sql.Date.valueOf(edate));
+                ResultSet resInfoResult = pstmt.executeQuery();
+                
+                
+                // Step 5: Handle results
+                while (resInfoResult.next()) {
+                    String fnameResult = resInfoResult.getString("FirstName");
+                    String lnameResult = resInfoResult.getString("LastName");
+                    int reservationCodeResult = resInfoResult.getInt("Code");
+                    String roomCodeResult = resInfoResult.getString("Room");
+                    String CheckIn = resInfoResult.getString("CheckIn");
+                    String CheckOut = resInfoResult.getString("CheckOut");
+                    int rateResult = resInfoResult.getInt("Rate");
+                    int AdultsResult = resInfoResult.getInt("Adults");
+                    int kidsResult = resInfoResult.getInt("Kids");
+                    String RoomNameResult = resInfoResult.getString("RoomName");
+                    
+                    
+
+                    System.out.format("%s %s Reservation Code: %d Room Code: %s Check-in: %s Check-out: %s Rate: %d Adults: %d Kids: %d Room Name: %s %n", fnameResult, lnameResult, reservationCodeResult, roomCodeResult, CheckIn, CheckOut, rateResult, AdultsResult, kidsResult, RoomNameResult);
+                }
+
+
+                // Step 6: Commit or rollback transaction
+                dbConnection.commit();
+            } catch (SQLException e) {
+                dbConnection.rollback();
+            }
+
+        }
+        // Step 7: Close connection (handled implcitly by try-with-resources syntax)
     }
 
     
