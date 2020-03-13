@@ -32,7 +32,7 @@ public class InnReservations {
     }
 
     public void prompt() throws SQLException {
-        funcReq1();
+        funcReq3();
         System.exit(0);
         // int choice = -1;
         // String statement = "";
@@ -171,7 +171,7 @@ public class InnReservations {
             System.out.println("Enter the number of adults: ");
             na = scan.nextInt();
             if (nc + na > 4) {
-                System.println("The total number of people per reservation is 4.\nPlease break up your group and make separate reservations.");
+                System.out.println("The total number of people per reservation is 4.\nPlease break up your group and make separate reservations.");
             }
         } while (nc + na >  4);
     }
@@ -445,14 +445,6 @@ public class InnReservations {
         }
         dbConnection.close();
         scanner.close();
-        String sql =
-            " SELECT RoomCode, RoomName, Beds, bedType, maxOcc, basePrice, decor, ROW_NUMBER() OVER () AS Opt" +
-            " FROM " + rooms + " r"
-            " WHERE RoomCode NOT IN" +
-                " (SELECT DISTINCT R.RoomCode" +
-                " FROM " + rooms + " R" +
-                " INNER JOIN " + reservations + " res ON res.Room=R.RoomCode" +
-                " WHERE "
     }
 
     
