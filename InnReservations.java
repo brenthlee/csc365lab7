@@ -33,7 +33,7 @@ public class InnReservations {
     }
 
     public void prompt() throws SQLException {
-        funcReq5();
+        funcReq6();
         System.exit(0);
         // int choice = -1;
         // String statement = "";
@@ -537,6 +537,87 @@ public class InnReservations {
                     System.out.format("%s %s Reservation Code: %d Room Code: %s Check-in: %s Check-out: %s Rate: %d Adults: %d Kids: %d Room Name: %s %n", fnameResult, lnameResult, reservationCodeResult, roomCodeResult, CheckIn, CheckOut, rateResult, AdultsResult, kidsResult, RoomNameResult);
                 }
 
+
+                // Step 6: Commit or rollback transaction
+                dbConnection.commit();
+            } catch (SQLException e) {
+                dbConnection.rollback();
+            }
+
+        }
+        // Step 7: Close connection (handled implcitly by try-with-resources syntax)
+    }
+
+    // Revenue
+    public void funcReq6() throws SQLException {
+
+        // Step 1: Establish connection to RDBMS
+        try (Connection dbConnection = DriverManager.getConnection(url, name, pass)) {
+
+            // Step 2: Construct SQL statement
+            String RevenueSql = "with a as( " +
+                                    "select room, MONTH(CheckIn) as month, count(*) as reservations, round(sum(DATEDIFF(Checkout, CheckIn) * Rate),0) AS TotalCharge " +
+                                    "from lab7_reservations " +
+                                    "group by room, month ) " +
+                                "select IFNULL(room, 'totals') AS room, " +
+                                "SUM(CASE WHEN month = 1 THEN TotalCharge END) January, " +
+                                "SUM(CASE WHEN month = 2 THEN TotalCharge END) Febuary, " +
+                                "SUM(CASE WHEN month = 3 THEN TotalCharge END) March, " +
+                                "SUM(CASE WHEN month = 4 THEN TotalCharge END) April, " +
+                                "SUM(CASE WHEN month = 5 THEN TotalCharge END) May, " +
+                                "SUM(CASE WHEN month = 6 THEN TotalCharge END) June, " +
+                                "SUM(CASE WHEN month = 7 THEN TotalCharge END) July, " +
+                                "SUM(CASE WHEN month = 8 THEN TotalCharge END) August, " +
+                                "SUM(CASE WHEN month = 9 THEN TotalCharge END) September, " +
+                                "SUM(CASE WHEN month = 10 THEN TotalCharge END) October, " +
+                                "SUM(CASE WHEN month = 11 THEN TotalCharge END) November, " +
+                                "SUM(CASE WHEN month = 12 THEN TotalCharge END) December " +
+                                "from a " +
+                                "group by room WITH ROLLUP";
+
+            // Step 3: Start transaction
+            dbConnection.setAutoCommit(false);
+            
+            try (PreparedStatement pstmt = dbConnection.prepareStatement(RevenueSql)) {
+                
+                // Step 4: Send SQL statement to DBMS
+                ResultSet resInfoResult = pstmt.executeQuery();
+
+                // Step 4.5 formatting outut as table
+                String roomCol = "room";
+                String JanuaryCol = "January";
+                String febCol = "Febuary";
+                String marchcol = "March";
+                String aprilCol = "April";
+                String mayCol = "May";
+                String juneCol = "June";
+                String julyCol = "July";
+                String augcol = "August";
+                String septcol = "September";
+                String octCol = "October";
+                String novCol = "November";
+                String decCol = "December";
+                System.out.format("%-6s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %n", roomCol, JanuaryCol, febCol, marchcol, aprilCol, mayCol, juneCol, julyCol, augcol, septcol, octCol, novCol, decCol);
+
+                
+                // Step 5: Handle results
+                while (resInfoResult.next()) {
+                    String room = resInfoResult.getString("room");
+                    String jan = resInfoResult.getString("January");
+                    String feb = resInfoResult.getString("Febuary");
+                    String mar = resInfoResult.getString("March");
+                    String apr = resInfoResult.getString("April");
+                    String may = resInfoResult.getString("May");
+                    String jun = resInfoResult.getString("June");
+                    String july = resInfoResult.getString("July");
+                    String aug = resInfoResult.getString("August");
+                    String sept = resInfoResult.getString("September");
+                    String oct = resInfoResult.getString("October");
+                    String nov = resInfoResult.getString("November");
+                    String dec = resInfoResult.getString("December");
+
+                    System.out.format("%-6s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %n", room, jan, feb, mar, apr, may, jun, july, aug, sept, oct, nov, dec);
+                }
 
                 // Step 6: Commit or rollback transaction
                 dbConnection.commit();
