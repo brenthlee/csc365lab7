@@ -106,9 +106,9 @@ public class InnReservations {
                 "from MostRecentCheckout natural join lab7_reservations " +
                 "where most_recent_checkout = CheckOut " +
             ") " +
-                "select roomId, roomName, beds, bedType, maxOccupancy, basePrice, decor, popularity_score, next_available, most_recent_checkout, length_of_stay " +
+                "select RoomCode, roomName, beds, bedType, maxOccupancy, basePrice, decor, popularity_score, next_available, most_recent_checkout, length_of_stay " +
                 "from lab7_rooms, PopularityScoreByRoom natural join RoomNextAvail natural join MostRecentCheckout natural join LengthOfStay " +
-                "where Room = roomId " +
+                "where Room = RoomCode " +
             "order by popularity_score desc;";
 
 
@@ -122,7 +122,7 @@ public class InnReservations {
     public void executeFR1(String sql) throws SQLException {
         Connection dbConnection = connect();
         try (Statement stmt = dbConnection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
-            String rc = "roomId";
+            String rc = "RoomCode";
             String rn = "roomName";
             String beds = "beds";
             String bedType = "bedType";
