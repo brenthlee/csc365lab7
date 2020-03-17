@@ -106,7 +106,7 @@ public class InnReservations {
                 "from MostRecentCheckout natural join lab7_reservations " +
                 "where most_recent_checkout = CheckOut " +
             ") " +
-                "select RoomCode, roomName, beds, bedType, maxOccupancy, basePrice, decor, popularity_score, next_available, most_recent_checkout, length_of_stay " +
+                "select RoomCode, RoomName, Beds, bedType, maxOcc, basePrice, decor, popularity_score, next_available, most_recent_checkout, length_of_stay " +
                 "from lab7_rooms, PopularityScoreByRoom natural join RoomNextAvail natural join MostRecentCheckout natural join LengthOfStay " +
                 "where Room = RoomCode " +
             "order by popularity_score desc;";
@@ -129,10 +129,10 @@ public class InnReservations {
             String maxOcc = "maxOcc";
             String basePrice = "basePrice";
             String decor = "decor";
-            String pop = "Popularity";
-            String lastLen = "lastStayLength";
-            String lastCheckOut = "lastCheckOut";
-            String nextAvail = "NextAvailable";
+            String pop = "popularity_score";
+            String lastLen = "next_available";
+            String lastCheckOut = "most_recent_checkout";
+            String nextAvail = "length_of_stay";
             System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %14s | %12s | %13s\n", rc, rn,
                     beds, bedType, maxOcc, basePrice, decor, pop, lastLen, lastCheckOut, nextAvail);
             while (rs.next()) {
