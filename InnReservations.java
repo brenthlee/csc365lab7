@@ -33,7 +33,7 @@ public class InnReservations {
     }
 
     public void prompt() throws SQLException {
-        funcReq6();
+        funcReq1();
         System.exit(0);
         // int choice = -1;
         // String statement = "";
@@ -71,38 +71,46 @@ public class InnReservations {
 
     public void funcReq1() throws SQLException {
         String sql =
-            " WITH occ180 AS" +
-                " (SELECT Room," +
-                    "ROUND(SUM(DATEDIFF(CheckOut,GREATEST(CheckIn,DATE_ADD(CURRENT_DATE(),INTERVAL -180 DAY))))/180,2) Popularity" +
-                " FROM " + reservations + 
-                " WHERE CheckOut > DATE_ADD(CURRENT_DATE(), INTERVAL -180 DAY)" +
-                    " AND CheckIn < NOW()" +
-                " GROUP BY Room)," +
-            " nextAvail AS" +
-                "(with r1 as " +
-                    " (select RoomName, CheckIn, CheckOut"+
-                    " from " + rooms + ", " + reservations +
-                    " where r.RoomCode = res.Room),"+
-                    " r2 as (select fir.RoomName as room,"+
-                        " DATEDIFF(sec.CheckIn, fir.CheckOut) as diff,"+
-                        " fir.CheckOut as checkout, sec.CheckIn as checkin,"+
-                        " rank() over (partition by fir.RoomName order by checkout,"+
-                        " DATEDIFF(sec.CheckIn, fir.CheckOut) asc) as RANKING"+
-                    " FROM r1 fir JOIN r1 sec ON fir.RoomName=sec.RoomName"+
-                    " WHERE fir.Checkout < sec.CheckIn AND fir.CheckOut > NOW())"+
-                " SELECT Room, CheckOut NextAvailable" +
-                //" select room, DATE_ADD(checkout, INTERVAL 1 DAY) as Next_Available"
-                " FROM r2 WHERE RANKING = 1 ORDER BY room)," +
-            " recentRes AS" +
-                " (SELECT Room,DATEDIFF(MAX(CheckOut),MAX(CheckIn)) lastLength, MAX(CheckOut) lastCheckOut" +
-                " FROM " + reservations +
-                " WHERE CheckOut <= NOW()" +
-                " GROUP BY Room)" +
-            " SELECT r.*, Popularity, NextAvailable, lastLength lastStayLength, lastCheckOut" +
-            " FROM occ180 occ JOIN " + rooms + " r ON RoomCode=occ.Room" +
-                " JOIN recentRes res ON res.Room=r.RoomCode" +
-                " JOIN nextAvail n ON res.Room=n.Room" +
-            " ORDER BY Popularity DESC;";
+            "with DaysOccupiedByReservation as ( " +
+                "select Code, " +
+                    "Room, " +
+                    "datediff( " +
+                        "least(CheckOut, current_date()), " +
+                        "greatest(CheckIn, date_add(current_date(), interval -180 day)) " +
+                    ") as days_occupied_in_last_180 " +
+                "from Reservations " +
+            "), FixDaysOccupiedByReservation as ( " +
+                "select Code, Room, (case when (days_occupied_in_last_180 > 0) then days_occupied_in_last_180 else 0 end) as days_occupied_in_last_180 " +
+                "from DaysOccupiedByReservation " +
+            "), DaysOccupiedByRoom as ( " +
+                "select Room, sum(days_occupied_in_last_180) as occupied_sum " +
+                "from FixDaysOccupiedByReservation " +
+                "group by Room " +
+            "), FixedDaysOccupiedByRoom as ( " +
+                "select Room, (case when (occupied_sum > 0) then occupied_sum else 0 end) as occupied_sum " +
+                "from DaysOccupiedByRoom " +
+            "), PopularityScoreByRoom as ( " +
+                "select Room, round((occupied_sum / 180), 2) as popularity_score " +
+                "from FixedDaysOccupiedByRoom " +
+            "), RoomNextAvail as ( " +
+                "select Room, max(case when (current_date() between CheckIn and CheckOut) then CheckOut else current_date() end) as next_available " +
+                "from Reservations " +
+                "group by Room " +
+            "), MostRecentCheckout as ( " +
+                "select Room, max(CheckOut) as most_recent_checkout " +
+                "from Reservations " +
+                "where CheckOut <= current_date() " +
+                "group by Room " +
+            "), LengthOfStay as ( " +
+                "select Room, datediff(CheckOut, CheckIn) as length_of_stay " +
+                "from MostRecentCheckout natural join Reservations " +
+                "where most_recent_checkout = CheckOut " +
+            ") " +
+            "select Room, popularity_score, next_available, most_recent_checkout, length_of_stay " +
+            "from PopularityScoreByRoom natural join RoomNextAvail natural join MostRecentCheckout natural join LengthOfStay " +
+            "order by popularity_score desc;";
+
+
         try {
             executeFR1(sql);
         } catch (SQLException e) {
