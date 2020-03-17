@@ -133,7 +133,7 @@ public class InnReservations {
             String lastLen = "length_of_stay";
             String lastCheckOut = "most_recent_checkout";
             String nextAvail = "next_available";
-            System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %20s | %24s | %24s | %24s\n", rc, rn,
+            System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %20s | %18s | %24s | %18s\n", rc, rn,
                     beds, bedType, maxOcc, basePrice, decor, pop, lastLen, lastCheckOut, nextAvail);
             while (rs.next()) {
                 String Rc = rs.getString(rc);
@@ -147,7 +147,7 @@ public class InnReservations {
                 int LastLen = rs.getInt(lastLen);
                 String LastCheckOut = rs.getString(lastCheckOut);
                 String NextAvail = rs.getString(lastCheckOut);
-                System.out.format("%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %20s | %24s | %24s | %24s\n", Rc, Rn,
+                System.out.format("%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %20s | %18s | %24s | %18s\n", Rc, Rn,
                         Beds, BedType, MaxOcc, BasePrice, Decor, popularity, LastLen, LastCheckOut, NextAvail);
             }
         }
