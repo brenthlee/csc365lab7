@@ -33,7 +33,7 @@ public class InnReservations {
     }
 
     public void prompt() throws SQLException {
-        funcReq1();
+        funcReq3();
         System.exit(0);
         // int choice = -1;
         // String statement = "";
@@ -154,12 +154,7 @@ public class InnReservations {
         System.out.println("");
     }
 
-    public void funcReq2() throws SQLException {
-        // String sql =
-        // ;
-    }
-
-    public void executeFR2(String sql) throws SQLException {
+    public void funcReq2(String sql) throws SQLException {
         Connection conn = connect();
         System.out.println("MAKE A RESERVATION");
         Scanner scan = new Scanner(System.in);
