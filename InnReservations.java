@@ -123,18 +123,18 @@ public class InnReservations {
         Connection dbConnection = connect();
         try (Statement stmt = dbConnection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             String rc = "RoomCode";
-            String rn = "roomName";
-            String beds = "beds";
+            String rn = "RoomName";
+            String beds = "Beds";
             String bedType = "bedType";
-            String maxOcc = "maxOccupancy";
+            String maxOcc = "maxOcc";
             String basePrice = "basePrice";
             String decor = "decor";
-            String pop = "popularity_score";
-            String lastLen = "length_of_stay";
-            String lastCheckOut = "most_recent_checkout";
-            String nextAvail = "next_available";
-            System.out.format("\n%-8s | %-24s | %4s | %12s | %12s | %12s | %12s | %12s | %12s | %12s | %12s\n",
-            rc, rn, beds, bedType, maxOcc, basePrice, decor, pop, lastLen, lastCheckOut, nextAvail);
+            String pop = "Popularity";
+            String lastLen = "lastStayLength";
+            String lastCheckOut = "lastCheckOut";
+            String nextAvail = "NextAvailable";
+            System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %14s | %12s | %13s\n", rc, rn,
+                    beds, bedType, maxOcc, basePrice, decor, pop, lastLen, lastCheckOut, nextAvail);
             while (rs.next()) {
                 String Rc = rs.getString(rc);
                 String Rn = rs.getString(rn);
@@ -144,9 +144,9 @@ public class InnReservations {
                 int BasePrice = rs.getInt(basePrice);
                 String Decor = rs.getString(decor);
                 float popularity = rs.getFloat(pop);
-                String LastCheckOut = rs.getString(lastCheckOut);
                 int LastLen = rs.getInt(lastLen);
-                System.out.format("%-8s | %-24s | %4s | %12s | %12s | %12s | %12s | %12s | %12s | %12s | %12s\n", Rc, Rn,
+                String LastCheckOut = rs.getString(lastCheckOut);
+                System.out.format("%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %14s | %12s | %13s\n", Rc, Rn,
                         Beds, BedType, MaxOcc, BasePrice, Decor, popularity, LastLen, LastCheckOut, nextAvail);
             }
         }
