@@ -78,7 +78,7 @@ public class InnReservations {
                         "least(CheckOut, current_date()), " +
                         "greatest(CheckIn, date_add(current_date(), interval -180 day)) " +
                     ") as days_occupied_in_last_180 " +
-                "from Reservations " +
+                "from lab7_reservations " +
             "), FixDaysOccupiedByReservation as ( " +
                 "select Code, Room, (case when (days_occupied_in_last_180 > 0) then days_occupied_in_last_180 else 0 end) as days_occupied_in_last_180 " +
                 "from DaysOccupiedByReservation " +
@@ -94,16 +94,16 @@ public class InnReservations {
                 "from FixedDaysOccupiedByRoom " +
             "), RoomNextAvail as ( " +
                 "select Room, max(case when (current_date() between CheckIn and CheckOut) then CheckOut else current_date() end) as next_available " +
-                "from Reservations " +
+                "from lab7_reservations " +
                 "group by Room " +
             "), MostRecentCheckout as ( " +
                 "select Room, max(CheckOut) as most_recent_checkout " +
-                "from Reservations " +
+                "from lab7_reservations " +
                 "where CheckOut <= current_date() " +
                 "group by Room " +
             "), LengthOfStay as ( " +
                 "select Room, datediff(CheckOut, CheckIn) as length_of_stay " +
-                "from MostRecentCheckout natural join Reservations " +
+                "from MostRecentCheckout natural join lab7_reservations " +
                 "where most_recent_checkout = CheckOut " +
             ") " +
             "select Room, popularity_score, next_available, most_recent_checkout, length_of_stay " +
