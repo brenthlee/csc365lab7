@@ -107,7 +107,7 @@ public class InnReservations {
                 "where most_recent_checkout = CheckOut " +
             ") " +
                 "select roomId, roomName, beds, bedType, maxOccupancy, basePrice, decor, popularity_score, next_available, most_recent_checkout, length_of_stay " +
-                "from Rooms, PopularityScoreByRoom natural join RoomNextAvail natural join MostRecentCheckout natural join LengthOfStay " +
+                "from lab7_rooms, PopularityScoreByRoom natural join RoomNextAvail natural join MostRecentCheckout natural join LengthOfStay " +
                 "where Room = roomId " +
             "order by popularity_score desc;";
 
@@ -133,8 +133,8 @@ public class InnReservations {
             String lastLen = "length_of_stay";
             String lastCheckOut = "most_recent_checkout";
             String nextAvail = "next_available";
-            System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %14s | %12s | %13s\n", rc, rn,
-                    beds, bedType, maxOcc, basePrice, decor, pop, lastLen, lastCheckOut, nextAvail);
+            System.out.format("\n%-8s | %-24s | %4s | %12s | %12s | %12s | %12s | %12s | %12s | %12s | %12s\n",
+            rc, rn, beds, bedType, maxOcc, basePrice, decor, pop, lastLen, lastCheckOut, nextAvail);
             while (rs.next()) {
                 String Rc = rs.getString(rc);
                 String Rn = rs.getString(rn);
@@ -146,7 +146,7 @@ public class InnReservations {
                 float popularity = rs.getFloat(pop);
                 String LastCheckOut = rs.getString(lastCheckOut);
                 int LastLen = rs.getInt(lastLen);
-                System.out.format("%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %14s | %12s | %13s\n", Rc, Rn,
+                System.out.format("%-8s | %-24s | %4s | %12s | %12s | %12s | %12s | %12s | %12s | %12s | %12s\n", Rc, Rn,
                         Beds, BedType, MaxOcc, BasePrice, Decor, popularity, LastLen, LastCheckOut, nextAvail);
             }
         }
