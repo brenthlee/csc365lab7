@@ -106,8 +106,9 @@ public class InnReservations {
                 "from MostRecentCheckout natural join lab7_reservations " +
                 "where most_recent_checkout = CheckOut " +
             ") " +
-            "select Room, popularity_score, next_available, most_recent_checkout, length_of_stay " +
-            "from PopularityScoreByRoom natural join RoomNextAvail natural join MostRecentCheckout natural join LengthOfStay " +
+                "select roomId, roomName, beds, bedType, maxOccupancy, basePrice, decor, popularity_score, next_available, most_recent_checkout, length_of_stay " +
+                "from Rooms, PopularityScoreByRoom natural join RoomNextAvail natural join MostRecentCheckout natural join LengthOfStay " +
+                "where Room = roomId " +
             "order by popularity_score desc;";
 
 
@@ -121,17 +122,17 @@ public class InnReservations {
     public void executeFR1(String sql) throws SQLException {
         Connection dbConnection = connect();
         try (Statement stmt = dbConnection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
-            String rc = "RoomCode";
-            String rn = "RoomName";
-            String beds = "Beds";
+            String rc = "roomId";
+            String rn = "roomName";
+            String beds = "beds";
             String bedType = "bedType";
-            String maxOcc = "maxOcc";
+            String maxOcc = "maxOccupancy";
             String basePrice = "basePrice";
             String decor = "decor";
-            String pop = "Popularity";
-            String lastLen = "lastStayLength";
-            String lastCheckOut = "lastCheckOut";
-            String nextAvail = "NextAvailable";
+            String pop = "popularity_score";
+            String lastLen = "length_of_stay";
+            String lastCheckOut = "most_recent_checkout";
+            String nextAvail = "next_available";
             System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %14s | %12s | %13s\n", rc, rn,
                     beds, bedType, maxOcc, basePrice, decor, pop, lastLen, lastCheckOut, nextAvail);
             while (rs.next()) {
@@ -143,8 +144,8 @@ public class InnReservations {
                 int BasePrice = rs.getInt(basePrice);
                 String Decor = rs.getString(decor);
                 float popularity = rs.getFloat(pop);
-                int LastLen = rs.getInt(lastLen);
                 String LastCheckOut = rs.getString(lastCheckOut);
+                int LastLen = rs.getInt(lastLen);
                 System.out.format("%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %14s | %12s | %13s\n", Rc, Rn,
                         Beds, BedType, MaxOcc, BasePrice, Decor, popularity, LastLen, LastCheckOut, nextAvail);
             }
