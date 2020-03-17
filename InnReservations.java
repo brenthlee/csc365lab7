@@ -33,7 +33,7 @@ public class InnReservations {
     }
 
     public void prompt() throws SQLException {
-        funcReq3();
+        funcReq2();
         System.exit(0);
         // int choice = -1;
         // String statement = "";
@@ -154,10 +154,10 @@ public class InnReservations {
         System.out.println("");
     }
 
-    public void funcReq2(String sql) throws SQLException {
-        Connection conn = connect();
+    public void funcReq2() throws SQLException {
         System.out.println("MAKE A RESERVATION");
         Scanner scan = new Scanner(System.in);
+
         System.out.println("Enter your first name: ");
         String fn = scan.next();
         System.out.println("Enter your last name: ");
@@ -170,6 +170,7 @@ public class InnReservations {
         String ci = scan.next();
         System.out.println("Enter a check-out date (YYYY-MM-DD): ");
         String co = scan.next();
+
         int nc, na;
         do {
             System.out.println("Enter the number of children: ");
@@ -180,6 +181,221 @@ public class InnReservations {
                 System.out.println("The total number of people per reservation is 4.\nPlease break up your group and make separate reservations.");
             }
         } while (nc + na >  4);
+
+        String sqlBase =
+            "with OverlappingRooms as ( " +
+                "select distinct Room " +
+                "from lab7_reservations " +
+                "where (CheckIn <  ?  and  ?  <= CheckOut) " +
+                    "or (CheckIn <  ?  and  ?  <= CheckOut) " +
+            "), OverlappingRooms_ShiftRight as ( " +
+                "select distinct Room " +
+                "from lab7_reservations " +
+                "where (CheckIn < date_add( ? , interval 1 day) and date_add( ? , interval 1 day) <= CheckOut) " +
+                "    or (CheckIn < date_add( ? , interval 1 day) and date_add( ? , interval 1 day) <= CheckOut) " +
+            "), OverlappingRooms_ShiftLeft as ( " +
+                "select distinct Room " +
+                "from lab7_reservations " +
+                "where (CheckIn < date_add( ? , interval -1 day) and date_add( ? , interval -1 day) <= CheckOut) " +
+                "    or (CheckIn < date_add( ? , interval -1 day) and date_add( ? , interval -1 day) <= CheckOut) " +
+            "), OverlappingRooms_ShortenEnd as ( " +
+                "select distinct Room " +
+                "from lab7_reservations " +
+                "where (CheckIn <  ?  and  ?  < CheckOut) " +
+                "    or (CheckIn < date_add( ? , interval -1 day) and date_add( ? , interval -1 day) <= CheckOut) " +
+            "), OverlappingRooms_ShortenStart as ( " +
+                "select distinct Room " +
+                "from lab7_reservations " +
+                "where (CheckIn < date_add( ? , interval 1 day) and date_add( ? , interval 1 day) <= CheckOut) " +
+                "    or (CheckIn <  ?  and  ?  < CheckOut) " +
+            "), OverlappingRooms_ShiftRightTwo as ( " +
+                "select distinct Room " +
+                "from lab7_reservations " +
+                "where (CheckIn < date_add( ? , interval 2 day) and date_add( ? , interval 2 day) <= CheckOut) " +
+                "    or (CheckIn < date_add( ? , interval 2 day) and date_add( ? , interval 2 day) <= CheckOut) " +
+            "), OverlappingRooms_ShiftLeftTwo as ( " +
+                "select distinct Room " +
+                "from lab7_reservations " +
+                "where (CheckIn < date_add( ? , interval -2 day) and date_add( ? , interval -2 day) <= CheckOut) " +
+                "    or (CheckIn < date_add( ? , interval -2 day) and date_add( ? , interval -2 day) <= CheckOut) " +
+            "), AvailableRooms as ( " +
+                "select RoomCode as Room, " +
+                    " ?  as CheckIn, " +
+                    " ?  as CheckOut, " +
+                    "0 as Priority " +
+                "from lab7_rooms " +
+                "where RoomCode not in ( " +
+                    "select Room from OverlappingRooms " +
+                ") " +
+            "), AvailableRooms_ShiftRight as ( " +
+                "select RoomCode as Room, " +
+                    "date_add( ? , interval 1 day) as CheckIn, " +
+                    "date_add( ? , interval 1 day) as CheckOut, " +
+                    "2 as Priority " +
+                "from lab7_rooms " +
+                "where RoomCode not in ( " +
+                    "select Room from OverlappingRooms_ShiftRight " +
+                ") " +
+            "), AvailableRooms_ShiftLeft as ( " +
+                "select RoomCode as Room, " +
+                    "date_add( ? , interval -1 day) as CheckIn, " +
+                    "date_add( ? , interval -1 day) as CheckOut, " +
+                    "2 as Priority " +
+                "from lab7_rooms " +
+                "where RoomCode not in ( " +
+                    "select Room from OverlappingRooms_ShiftLeft " +
+                ") " +
+            "), AvailableRooms_ShortenEnd as ( " +
+                "select RoomCode as Room, " +
+                    " ?  as CheckIn, " +
+                    "date_add( ? , interval -1 day) as CheckOut, " +
+                    "1 as Priority " +
+                "from lab7_rooms " +
+                "where RoomCode not in ( " +
+                    "select Room from OverlappingRooms_ShortenEnd " +
+                ") " +
+            "), AvailableRooms_ShortenStart as ( " +
+                "select RoomCode as Room, " +
+                    "date_add( ? , interval 1 day) as CheckIn, " +
+                    " ?  as CheckOut, " +
+                    "1 as Priority " +
+                "from lab7_rooms " +
+                "where RoomCode not in ( " +
+                    "select Room from OverlappingRooms_ShortenStart " +
+                ") " +
+            "), AvailableRooms_ShiftRightTwo as ( " +
+                "select RoomCode as Room, " +
+                    "date_add( ? , interval 2 day) as CheckIn, " +
+                    "date_add( ? , interval 2 day) as CheckOut, " +
+                    "3 as Priority " +
+                "from lab7_rooms " +
+                "where RoomCode not in ( " +
+                    "select Room from OverlappingRooms_ShiftRightTwo " +
+                ") " +
+            "), AvailableRooms_ShiftLeftTwo as ( " +
+                "select RoomCode as Room, " +
+                    "date_add( ? , interval -2 day) as CheckIn, " +
+                    "date_add( ? , interval -2 day) as CheckOut, " +
+                    "3 as Priority " +
+                "from lab7_rooms " +
+                "where RoomCode not in ( " +
+                    "select Room from OverlappingRooms_ShiftLeftTwo " +
+                ") " +
+            "), AllAvailByPriority as ( " +
+                "select * " +
+                "from AvailableRooms " +
+                "union " +
+                "select * " +
+                "from AvailableRooms_ShiftRight " +
+                "union " +
+                "select * " +
+                "from AvailableRooms_ShiftLeft " +
+                "union " +
+                "select * " +
+                "from AvailableRooms_ShortenEnd " +
+                "union " +
+                "select * " +
+                "from AvailableRooms_ShortenStart " +
+                "union " +
+                "select * " +
+                "from AvailableRooms_ShiftRightTwo " +
+                "union " +
+                "select * " +
+                "from AvailableRooms_ShiftLeftTwo " +
+            "), AllAvailPlusInfo as ( " +
+                "select *  " +
+                "from AllAvailByPriority, lab7_rooms " +
+                "where RoomCode = Room " +
+                "order by Priority, Room " +
+            "), CheckOccupancy as ( " +
+                "select Room, CheckIn, CheckOut, Priority, bedType " +
+                "from AllAvailPlusInfo " +
+                "where maxOcc >= ? " +
+            "), FuzzyMatch as ( " +
+                "select * " +
+                "from CheckOccupancy " +
+            "), FilterBed as ( " +
+                "select * " +
+                "from CheckOccupancy " +
+                "where bedType like ? " +
+            "), FilterRoom as ( " +
+                "select * " +
+                "from FilterBed " +
+                "where Room like ? " +
+            "), ExactMatch as ( " +
+                "select * " +
+                "from FilterRoom " +
+                "where Priority = 0 " +
+            ") ";
+
+        String sqlExact =
+            "select * " +
+            "from ExactMatch;";
+
+        String sqlFuzzy =
+            "select * " +
+            "from ExactMatch;";
+
+        // Step 1: Establish connection to RDBMS
+        try (Connection dbConnection = DriverManager.getConnection(url, name, pass)) {
+            
+            // Prepare exactQuery
+            PreparedStatement exactQuery = dbConnection.prepareStatement(sqlBase + sqlExact);
+            for (int i = 0; i < 25; i+=4)
+            {
+                exactQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
+                exactQuery.setDate(i+2, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
+                exactQuery.setDate(i+3, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
+                exactQuery.setDate(i+4, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
+            }
+            for (int i = 28; i < 41; i+=2)
+            {
+                exactQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
+                exactQuery.setDate(i+2, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
+            }
+            if (bt.toUpperCase().equals("ANY"))
+            {
+                bt = "%";
+            }
+            if (rc.toUpperCase().equals("ANY"))
+            {
+                rc = "%";
+            }
+            exactQuery.setString(43, bt.toUpperCase());
+            exactQuery.setString(44, rc.toUpperCase());
+
+
+            // Prepare exactQuery
+            PreparedStatement fuzzyQuery = dbConnection.prepareStatement(sqlBase + sqlFuzzy);
+            for (int i = 0; i < 25; i+=4)
+            {
+                fuzzyQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
+                fuzzyQuery.setDate(i+2, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
+                fuzzyQuery.setDate(i+3, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
+                fuzzyQuery.setDate(i+4, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
+            }
+            for (int i = 28; i < 41; i+=2)
+            {
+                fuzzyQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
+                fuzzyQuery.setDate(i+2, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
+            }
+            if (bt.toUpperCase().equals("ANY"))
+            {
+                bt = "%";
+            }
+            if (rc.toUpperCase().equals("ANY"))
+            {
+                rc = "%";
+            }
+            fuzzyQuery.setInt(43, nc + na);
+            fuzzyQuery.setString(44, bt.toUpperCase());
+            fuzzyQuery.setString(45, rc.toUpperCase());
+
+            ResultSet exactResult = fuzzyQuery.executeQuery();
+            ResultSet fuzzyResult = fuzzyQuery.executeQuery();
+       } catch(SQLException e) {
+           e.printStackTrace();
+       }
     }
 
     // update reservation
