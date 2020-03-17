@@ -130,9 +130,9 @@ public class InnReservations {
             String basePrice = "basePrice";
             String decor = "decor";
             String pop = "popularity_score";
-            String lastLen = "next_available";
+            String lastLen = "length_of_stay";
             String lastCheckOut = "most_recent_checkout";
-            String nextAvail = "length_of_stay";
+            String nextAvail = "next_available";
             System.out.format("\n%-8s | %-24s | %4s | %7s | %6s | %9s | %11s | %10s | %14s | %12s | %13s\n", rc, rn,
                     beds, bedType, maxOcc, basePrice, decor, pop, lastLen, lastCheckOut, nextAvail);
             while (rs.next()) {
