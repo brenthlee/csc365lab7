@@ -1,9 +1,6 @@
 import java.sql.*;
 import java.util.*;
 
-// import sun.awt.www.content.audio.x_aiff;
-
-import java.time.LocalDate;
 
 public class InnReservations {
     static String url;
@@ -39,7 +36,6 @@ public class InnReservations {
         // funcReq6();
 
         int choice = -1;
-        String input = "";
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the inn reservation system");
 
@@ -82,6 +78,7 @@ public class InnReservations {
             }
         }
         System.out.println("Goodbye");
+        scanner.close();
         System.exit(0);
     }
 
@@ -281,7 +278,6 @@ public class InnReservations {
                     String room = exactResult.getString("Room");
                     String checkIn = exactResult.getString("CheckIn");
                     String checkOut = exactResult.getString("CheckOut");
-                    int priority = exactResult.getInt("Priority");
                     String bedType = exactResult.getString("bedType");
 
                     System.out.format("\n%-12d | %-12s | %-12s | %12s | %12s\n", index, room, checkIn, checkOut,
@@ -333,6 +329,7 @@ public class InnReservations {
                     }
                 } else {
                     System.out.println("Invalid Selection");
+                    scan.close();
                     return;
                 }
             }
@@ -369,7 +366,6 @@ public class InnReservations {
                     String room = fuzzyResult.getString("Room");
                     String checkIn = fuzzyResult.getString("CheckIn");
                     String checkOut = fuzzyResult.getString("CheckOut");
-                    int priority = fuzzyResult.getInt("Priority");
                     String bedType = fuzzyResult.getString("bedType");
 
                     System.out.format("\n%-12d | %-12s | %-12s | %12s | %12s\n", index, room, checkIn, checkOut,
@@ -421,13 +417,16 @@ public class InnReservations {
                     }
                 } else {
                     System.out.println("Invalid Selection");
+                    scan.close();
                     return;
                 }
             }
 
         } catch (SQLException e) {
+            scan.close();
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
+            scan.close();
             System.out
                     .println("The date format is not correct, please try again and input a correctly formatted date\n");
         }
@@ -708,8 +707,6 @@ public class InnReservations {
 
     // Detailed Reservation Information
     public void funcReq5() throws SQLException, IllegalArgumentException {
-        String tempInput = "";
-
         // Step 1: Establish connection to RDBMS
         try (Connection dbConnection = DriverManager.getConnection(url, name, pass)) {
 
