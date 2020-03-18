@@ -918,7 +918,7 @@ public class InnReservations {
                 dbConnection.rollback();
             }
             catch (IllegalArgumentException e){
-                System.out.println("ill-formatted input!\n");
+                System.out.println("The date format is not correct, please try again and input a correctly formatted date\n");
             }
 
         }
