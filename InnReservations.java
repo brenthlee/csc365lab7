@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.*;
+import java.io.*;
 
 
 public class InnReservations {
@@ -9,7 +10,7 @@ public class InnReservations {
     static final String rooms = "blee96.lab7_rooms";
     static final String reservations = "blee96.lab7_reservations";
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, IOException {
         try {
             InnReservations IR = new InnReservations();
             // // TO-DO
@@ -32,7 +33,7 @@ public class InnReservations {
         }
     }
 
-    public void prompt() throws SQLException {
+    public void prompt() throws SQLException, IOException {
         // funcReq6();
 
         int choice = -1;
@@ -74,11 +75,18 @@ public class InnReservations {
                 }
             } else {
                 System.out.println("Please enter a valid command: 1-6 or 0 to quit!");
-                scanner.next();
+                if (scanner.hasNext()){
+                    // Scanner sc2 = new Scanner(System.in);
+                    scanner.next();
+                }
+                else {
+
+                }
+                
             }
         }
         System.out.println("Goodbye");
-        scanner.close();
+        // scanner.close();
         System.exit(0);
     }
 
@@ -329,7 +337,7 @@ public class InnReservations {
                     }
                 } else {
                     System.out.println("Invalid Selection");
-                    scan.close();
+                    // scan.close();
                     return;
                 }
             }
@@ -417,16 +425,16 @@ public class InnReservations {
                     }
                 } else {
                     System.out.println("Invalid Selection");
-                    scan.close();
+                    // scan.close();
                     return;
                 }
             }
 
         } catch (SQLException e) {
-            scan.close();
+            // scan.close();
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
-            scan.close();
+            // scan.close();
             System.out
                     .println("The date format is not correct, please try again and input a correctly formatted date\n");
         }
@@ -468,7 +476,7 @@ public class InnReservations {
         }
         if (reservationCode == 0) {
             System.out.println("[Error] Invalid Entry");
-            scanner.close();
+            // scanner.close();
             return;
         }
 
@@ -493,8 +501,8 @@ public class InnReservations {
             }
         } catch (SQLException e) {
             dbConnection.rollback();
-            dbConnection.close();
-            scanner.close();
+            // dbConnection.close();
+            // scanner.close();
             e.printStackTrace();
         }
 
@@ -567,8 +575,8 @@ public class InnReservations {
                 }
             } catch (SQLException e) {
                 dbConnection.rollback();
-                dbConnection.close();
-                scanner.close();
+                // dbConnection.close();
+                // scanner.close();
                 e.printStackTrace();
             }
 
@@ -594,8 +602,8 @@ public class InnReservations {
                     dbConnection.commit();
                 } catch (SQLException e) {
                     dbConnection.rollback();
-                    dbConnection.close();
-                    scanner.close();
+                    // dbConnection.close();
+                    // scanner.close();
                     e.printStackTrace();
                 }
                 System.out.println(String.valueOf(updateRowsCount) + " reservations updated with the following:");
@@ -612,8 +620,8 @@ public class InnReservations {
         }
 
         // TearDown
-        dbConnection.close();
-        scanner.close();
+        // dbConnection.close();
+        // scanner.close();
     }
 
     // cancel reservation
@@ -641,7 +649,7 @@ public class InnReservations {
         }
         if (reservationCode == 0) {
             System.out.println("[Error] Invalid Entry");
-            scanner.close();
+            // scanner.close();
             return;
         }
 
@@ -658,8 +666,8 @@ public class InnReservations {
             }
         } catch (SQLException e) {
             dbConnection.rollback();
-            dbConnection.close();
-            scanner.close();
+            // dbConnection.close();
+            // scanner.close();
             e.printStackTrace();
         }
 
@@ -688,8 +696,8 @@ public class InnReservations {
                     dbConnection.commit();
                 } catch (SQLException e) {
                     dbConnection.rollback();
-                    dbConnection.close();
-                    scanner.close();
+                    // dbConnection.close();
+                    // scanner.close();
                     e.printStackTrace();
                 }
             } else {
@@ -701,8 +709,8 @@ public class InnReservations {
             System.out.println("Reservation not found.");
             dbConnection.rollback();
         }
-        dbConnection.close();
-        scanner.close();
+        // dbConnection.close();
+        // scanner.close();
     }
 
     // Detailed Reservation Information
@@ -799,7 +807,7 @@ public class InnReservations {
                 System.out.println(
                         "The date format is not correct, please try again and input a correctly formatted date\n");
             }
-
+        // scanner.close();
         }
         // Step 7: Close connection (handled implcitly by try-with-resources syntax)
     }

@@ -1,0 +1,3 @@
+database username: blee96
+
+databases: lab7_rooms, lab7_reservations
