@@ -1,0 +1,490 @@
+commit 1da255df8351199052e58fe21f78b186e454262f
+Author: Ryan Nevils <ryan@mbp.local>
+Date:   Wed Mar 18 16:27:08 2020 -0700
+
+    fixing last exception errors
+
+ InnReservations.java | 58 ++++++++++++++++++++++++++++++----------------------
+ database.txt         |  3 +++
+ 2 files changed, 36 insertions(+), 25 deletions(-)
+
+commit cbf2416b40e50d088d1e8f082beea8c2fe558eca
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Wed Mar 18 15:51:48 2020 -0700
+
+    sanitized some inputs
+
+ InnReservations.java | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
+
+commit 9c1920d7a3cfddab6d409d62b865207416d82139
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Wed Mar 18 15:46:39 2020 -0700
+
+    sanitized some inputs
+
+ InnReservations.java | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit d3f0549ae4be6a149016e649e9d14abd168ff617
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Wed Mar 18 15:42:23 2020 -0700
+
+    sanitized some inputs
+
+ InnReservations.java | 672 +++++++++++++++++++++------------------------------
+ 1 file changed, 269 insertions(+), 403 deletions(-)
+
+commit 2d9d78371dea609f2ab717beb875d0b1be7f692d
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Wed Mar 18 15:30:18 2020 -0700
+
+    sanitized some inputs
+
+ InnReservations.java | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
+
+commit e2b69af60dfd1a3c95aac3e4aa1228daae67fb0a
+Author: Ryan Nevils <ryan@mbp.local>
+Date:   Wed Mar 18 15:12:51 2020 -0700
+
+    exception for bad date input
+
+ InnReservations.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 488e8c7fc7abb6a5fc0e73e06cb307c9e45ac472
+Author: Ryan Nevils <ryan@mbp.local>
+Date:   Wed Mar 18 15:10:52 2020 -0700
+
+    added command line menu
+
+ InnReservations.java | 84 ++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 48 insertions(+), 36 deletions(-)
+
+commit 810089ed24ba14ba8e6f6f683b75c7f60f209799
+Merge: 33c37ad b89a436
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Wed Mar 18 13:34:48 2020 -0700
+
+    Merge branch 'master' of github.com:brenthlee/csc365lab7
+
+commit 33c37ad60dfe595dd83b31ac6f2dfffed812777e
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Wed Mar 18 13:34:37 2020 -0700
+
+    FNRQ2 fixed overlap detection
+
+ InnReservations.java | 53 ++++++++++++++++++++++------------------------------
+ 1 file changed, 22 insertions(+), 31 deletions(-)
+
+commit b89a436bb429ba2743a14c616569abb9ba3b02e0
+Author: Ryan Nevils <ryan@mbp.local>
+Date:   Wed Mar 18 13:30:46 2020 -0700
+
+    FR6
+
+ InnReservations.java | 49 +++++++++++++++++++++++++++----------------------
+ 1 file changed, 27 insertions(+), 22 deletions(-)
+
+commit a7c8fa7510ed3106539d1908b5a132515c6b6fbe
+Author: Ryan Nevils <ryan@mbp.local>
+Date:   Wed Mar 18 13:15:48 2020 -0700
+
+    FR5 done
+
+ InnReservations.java | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit a19b0607d834a01c9c19d67e33cc8bbbd9ed554f
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Wed Mar 18 12:24:58 2020 -0700
+
+    FNRQ2 basically done, minus the rate calcualtion
+
+ InnReservations.java | 122 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 118 insertions(+), 4 deletions(-)
+
+commit e52697d5248cb1c3529d2f4e0413fb7f8121cf8f
+Author: Henry <hluengas@calpoly.edu>
+Date:   Wed Mar 18 10:40:48 2020 -0700
+
+    FNRQ2 request mostly done, still need to do the actual reservation update part
+
+ InnReservations.java | 148 ++++++++++++++++++++++++++++++++-------------------
+ working.sql          | 146 --------------------------------------------------
+ 2 files changed, 94 insertions(+), 200 deletions(-)
+
+commit e2fff8aec307e11152dc49052c13791d8383acfd
+Merge: 5c87ff7 dbc7a65
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Tue Mar 17 16:06:29 2020 -0700
+
+    Merge branch 'master' of github.com:brenthlee/csc365lab7
+
+commit 5c87ff7d868a2ce257d595549ea5b8536ffcd08f
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Tue Mar 17 16:06:25 2020 -0700
+
+    WIP
+
+ InnReservations.java | 222 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 219 insertions(+), 3 deletions(-)
+
+commit dbc7a651d51d2ed6d0628c64ddddc7289056310f
+Author: Henry <hluengas@calpoly.edu>
+Date:   Tue Mar 17 14:16:52 2020 -0700
+
+    WIP
+
+ InnReservations.java | 222 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 219 insertions(+), 3 deletions(-)
+
+commit 8a5d9ee34356c2f8e82e925339e1a3e527d8ddaf
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Tue Mar 17 12:15:09 2020 -0700
+
+    FNRQ2 WIP
+
+ InnReservations.java |   9 +---
+ working.sql          | 146 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 148 insertions(+), 7 deletions(-)
+
+commit b0b5f83e0dda76317206aac9f8a4153b503aa340
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Mon Mar 16 20:44:24 2020 -0700
+
+    FNRQ1 Done
+
+ InnReservations.java | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit fd7ac48bdf712848b6cf40659d3d6c5d38b08543
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Mon Mar 16 20:41:14 2020 -0700
+
+    wip
+
+ InnReservations.java | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+commit a56ff5e05be514d622b3cadd25eb454d423c3861
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Mon Mar 16 20:37:52 2020 -0700
+
+    wip
+
+ InnReservations.java | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 2761bc485c2523739faa8ae2d78cb3ad478f2aeb
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Mon Mar 16 20:35:54 2020 -0700
+
+    wip
+
+ InnReservations.java | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+commit 2b76abe1bdd61512a524b63090b4f026ab4983b4
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Mon Mar 16 20:34:00 2020 -0700
+
+    wip
+
+ InnReservations.java | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+commit 356204d9df5177e045a5f49d6bc529ea8d62bf70
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Mon Mar 16 20:32:17 2020 -0700
+
+    wip
+
+ InnReservations.java | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 37e6b573f98d9b4c52fc7efe49703882b7770c25
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Mon Mar 16 20:30:25 2020 -0700
+
+    wip
+
+ InnReservations.java | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit a39319daef96d9e03085d3dfdcd7b13cace48988
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Mon Mar 16 20:24:27 2020 -0700
+
+    wip
+
+ InnReservations.java | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
+
+commit c3b7d175aabbc0920fd7f349631895278a17a049
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Mon Mar 16 20:12:44 2020 -0700
+
+    wip
+
+ InnReservations.java | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit e8b48272175eb4cc3b89b30538ff45da740e79ec
+Author: Henry Luengas <gyatso@pop-os.localdomain>
+Date:   Mon Mar 16 20:08:10 2020 -0700
+
+    rewrote frq1
+
+ InnReservations.java | 74 +++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 41 insertions(+), 33 deletions(-)
+
+commit 27e5c9a8d7674e6b272626528ebbfd29a62385a5
+Author: Ryan Nevils <ryan@mbp.local>
+Date:   Fri Mar 13 21:21:36 2020 -0700
+
+    FR6 basically done
+
+ InnReservations.java | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 82 insertions(+), 1 deletion(-)
+
+commit c989d6b5cf4560863c73d8302da54f61b2e9f864
+Author: Ryan Nevils <ryan@mbp.local>
+Date:   Fri Mar 13 16:21:54 2020 -0700
+
+    completed FR5
+
+ InnReservations.java | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 102 insertions(+), 1 deletion(-)
+
+commit 9963ddb158f2b8a489cf0dfbbfaeade4a919a372
+Author: Ryan Nevils <ryan@mbp.local>
+Date:   Thu Mar 12 21:11:31 2020 -0700
+
+    fixing merge issues
+
+ InnReservations.java | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
+
+commit 76117e97cb8812f8ef7a0bc55c11009c5c4485a2
+Merge: a39dcef 2d46ebd
+Author: Henry Luengas <henryluengas@gmail.com>
+Date:   Thu Mar 12 20:25:20 2020 -0700
+
+    Merge branch 'master' into henry
+
+commit 2d46ebdd70eb1069478c3ec41fd5cd704974265f
+Author: Brent Lee <brenthlee@gmail.com>
+Date:   Wed Mar 11 13:23:27 2020 -0700
+
+    started part 2
+
+ InnReservations.java | 41 ++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 36 insertions(+), 5 deletions(-)
+
+commit a39dcef2673d127bf3f824173c920492f2b479c2
+Author: Henry <hluengas@calpoly.edu>
+Date:   Sat Mar 7 14:47:00 2020 -0800
+
+    FRQ4 done, lightly tested, always rollsback so entries are not actually deleted while testing
+
+ InnReservations.java | 103 +++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 95 insertions(+), 8 deletions(-)
+
+commit bbc71e47b78ce3773f7c7f57cfeb1d644dc89a42
+Author: Henry <hluengas@calpoly.edu>
+Date:   Sat Mar 7 11:44:10 2020 -0800
+
+    FRQ3 Done, did some testing
+
+ InnReservations.java | 151 ++++++++++++++++++++++++++-------------------------
+ 1 file changed, 78 insertions(+), 73 deletions(-)
+
+commit 29e29aa6d5af1e0b1b37dd78a6a688d8616ceb69
+Author: Henry <hluengas@calpoly.edu>
+Date:   Fri Mar 6 22:13:37 2020 -0800
+
+    FRQ3, roomExists and overlappingRooms queries done and working
+
+ InnReservations.java | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+commit 3d6c031fcda340f1dbaebb7991da4af749a21168
+Author: Henry <hluengas@calpoly.edu>
+Date:   Fri Mar 6 21:42:42 2020 -0800
+
+    WIP FRQ3
+
+ InnReservations.class | Bin 7246 -> 0 bytes
+ InnReservations.java  | 210 +++++++++++++++++++++++++++++++++++---------------
+ 2 files changed, 147 insertions(+), 63 deletions(-)
+
+commit 6345657a59eca546788d2aa8099d6c95afdbbb1f
+Author: Henry Luengas <henryluengas@gmail.com>
+Date:   Fri Mar 6 18:08:57 2020 -0800
+
+    WIP
+
+ InnReservations.class | Bin 0 -> 7246 bytes
+ InnReservations.java  | 231 +++++++++++++++++++++++++++++++++-----------------
+ run.sh                |   4 +-
+ 3 files changed, 157 insertions(+), 78 deletions(-)
+
+commit b564062cb60ab43d398c391711ea715122488023
+Author: Brent Lee <brenthlee@gmail.com>
+Date:   Thu Mar 5 10:43:39 2020 -0800
+
+    making changes to requiremennt 1
+
+ InnReservations.java | 46 +++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 33 insertions(+), 13 deletions(-)
+
+commit 685415443f8e97cea46b3c995aad315c563c82ad
+Author: Brent Lee <brenthlee@gmail.com>
+Date:   Thu Mar 5 10:01:13 2020 -0800
+
+    removed extra scripts and make file. to run, type ./run.sh
+
+ .gitignore       | 1 -
+ Makefile         | 7 -------
+ README.md        | 2 +-
+ env_variables.sh | 5 -----
+ run.sh           | 8 ++++++--
+ 5 files changed, 7 insertions(+), 16 deletions(-)
+
+commit d0c9465d9b73382ad36e21f780597f3a0fb17b15
+Author: Henry Luengas <henryluengas@gmail.com>
+Date:   Wed Mar 4 11:15:59 2020 -0800
+
+    Add files via upload
+
+ env_variables.sh | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+commit fcd174d0a4f84aa0c0101bd5667c8a4e94795ccb
+Author: Henry Luengas <henryluengas@gmail.com>
+Date:   Wed Mar 4 11:13:37 2020 -0800
+
+    updated .sh name
+
+ run.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 7eaac7853c7430ce9b6e740284b34595ad631cca
+Author: Henry Luengas <henryluengas@gmail.com>
+Date:   Wed Mar 4 11:08:52 2020 -0800
+
+    added gitignore
+
+ .gitignore              | 1 +
+ env_variable_example.sh | 5 -----
+ 2 files changed, 1 insertion(+), 5 deletions(-)
+
+commit 4bc5a062135f1eb10d39ae9f28d048140268cce3
+Author: Henry Luengas <henryluengas@gmail.com>
+Date:   Wed Mar 4 11:07:49 2020 -0800
+
+    added gitignore
+
+ .gitignore | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 2177e90dedcabf3298b57c31082c9e92599c6b77
+Author: Brent Lee <brenthlee@gmail.com>
+Date:   Wed Mar 4 11:06:11 2020 -0800
+
+    finished scripts. ./run.sh
+
+ InnReservations.java     | 6 +++---
+ env_variable_example.fsh | 5 -----
+ env_variable_example.sh  | 6 +++---
+ run.sh                   | 4 ++++
+ 4 files changed, 10 insertions(+), 11 deletions(-)
+
+commit db6f81278f5c45f306b1d38e8a5daf3c38512df0
+Author: Henry Luengas <henryluengas@gmail.com>
+Date:   Wed Mar 4 10:48:33 2020 -0800
+
+    ENV_VARIABLES readme
+
+ README.md | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 603866479784189d0534842e4f1eccf545630445
+Merge: a10db15 2b8b3d6
+Author: Henry Luengas <henryluengas@gmail.com>
+Date:   Wed Mar 4 10:45:46 2020 -0800
+
+    Merge branch 'master' of github.com:brenthlee/csc365lab7
+
+commit a10db159aaefcf515cf7a9a3c4e28509c8c8d01e
+Author: Henry Luengas <henryluengas@gmail.com>
+Date:   Wed Mar 4 10:45:40 2020 -0800
+
+    ENV_VARIABLES
+
+ InnReservations.java     | 11 ++++++++---
+ env_variable_example.fsh |  5 +++++
+ env_variable_example.sh  |  5 +++++
+ 3 files changed, 18 insertions(+), 3 deletions(-)
+
+commit 2b8b3d672ea218dfe4a468da1aae221805b974b3
+Author: Brent Lee <brenthlee@gmail.com>
+Date:   Wed Mar 4 10:43:42 2020 -0800
+
+    correction
+
+ InnReservations.java | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+commit d9c8d3a3c13b7830526a333e359cf4ab848c4aef
+Author: Brent Lee <brenthlee@gmail.com>
+Date:   Tue Mar 3 20:29:45 2020 -0800
+
+    added grant access setup to README
+
+ README.md | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+commit 9e843f7eb668fbe07f52f17249facaefdb08bc89
+Author: Brent Lee <brenthlee@gmail.com>
+Date:   Tue Mar 3 20:01:34 2020 -0800
+
+    polishing makefile and first requirement
+
+ InnReservations.class | Bin 4617 -> 0 bytes
+ InnReservations.java  |  74 ++++++++++++++++++++++++++++----------------------
+ Makefile              |   2 --
+ 3 files changed, 42 insertions(+), 34 deletions(-)
+
+commit ac5a9dd298a68a62cef42b96d08d4d5bf2222bc3
+Author: Brent Lee <brenthlee@gmail.com>
+Date:   Tue Mar 3 19:49:41 2020 -0800
+
+    finished with framework and almost done with first requirement
+
+ InnReservations.class           | Bin 0 -> 4617 bytes
+ InnReservations.java            | 122 ++++++++++++++++++++++++++++++++++++++++
+ Makefile                        |   9 +++
+ README.md                       |   2 +-
+ mysql-connector-java-8.0.16.jar | Bin 0 -> 2293144 bytes
+ 5 files changed, 132 insertions(+), 1 deletion(-)
+
+commit a98b95b5c9bf632fc3720ca9aa568cc14ed5ee47
+Author: Brent Lee <brenthlee@gmail.com>
+Date:   Tue Mar 3 11:39:44 2020 -0800
+
+    init README
+
+ README.md | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+commit bffbb445a63bf647896ca0fb4d0875d785567ef0
+Author: Brent Lee <brenthlee@gmail.com>
+Date:   Tue Mar 3 11:36:32 2020 -0800
+
+    Initial commit
+
+ README.md | 1 +
+ 1 file changed, 1 insertion(+)
