@@ -12,6 +12,8 @@ public class InnReservations {
     static final String rooms = "blee96.lab7_rooms";
     static final String reservations = "blee96.lab7_reservations";
 
+    int globalUniqueCounter = 0;
+
     public static void main(String[] args) throws SQLException {
         try {
             InnReservations IR = new InnReservations();
@@ -284,7 +286,7 @@ public class InnReservations {
                 "where RoomCode = Room " +
                 "order by Priority, Room " +
             "), CheckOccupancy as ( " +
-                "select Room, CheckIn, CheckOut, Priority, bedType " +
+                "select Room, CheckIn, CheckOut, Priority, bedType, basePrice " +
                 "from AllAvailPlusInfo " +
                 "where maxOcc >= ? " +
             "), FuzzyMatch as ( " +
@@ -310,7 +312,8 @@ public class InnReservations {
 
         String sqlFuzzy =
             "select * " +
-            "from FuzzyMatch;";
+            "from FuzzyMatch " +
+            "limit 5;";
 
         System.out.println("MAKE A RESERVATION");
         Scanner scan = new Scanner(System.in);
@@ -341,6 +344,8 @@ public class InnReservations {
 
         // Step 1: Establish connection to RDBMS
         try (Connection dbConnection = DriverManager.getConnection(url, name, pass)) {
+
+            dbConnection.setAutoCommit(false);
             
             // Prepare exactQuery
             PreparedStatement exactQuery = dbConnection.prepareStatement(sqlBase + sqlExact);
@@ -374,7 +379,9 @@ public class InnReservations {
             // if there is an exact reult handle it
             if (exactResult.next())
             {
+                System.out.println("The following rooms match your request exactly:");
                 int index = 1;
+                System.out.format("\n%-12s | %-12s | %-12s | %12s | %12s\n", "Listing #", "Room Code", "Available From", "Available To", "Bed Type");
                 do
                 {
                     String room = exactResult.getString("Room");
@@ -383,14 +390,67 @@ public class InnReservations {
                     int priority = exactResult.getInt("Priority");
                     String bedType = exactResult.getString("bedType");
 
-                    System.out.format("\n%-12d | %-12s | %-12s | %12s | %12d | %12s\n", index, room, checkIn, checkOut, priority, bedType);
+                    System.out.format("\n%-12d | %-12s | %-12s | %12s | %12s\n", index, room, checkIn, checkOut, bedType);
                     index += 1;
                 }
                 while (exactResult.next());
+
+                System.out.println("Select the desired booking by listing #, enter 0 to cancel");
+                int selection = scan.nextInt();
+                if (selection == 0)
+                {
+                    return;
+                }
+                else if (exactResult.absolute(selection))
+                {
+                    int reservationCode = ((int)(Math.random() * ((1000000000 - 10000000) + 1)) + 10000000);
+                    PreparedStatement insertReservation = dbConnection.prepareStatement("insert into lab7_reservations (CODE, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) value ( ?, ?, ?, ?, ?, ?, ?, ?, ? );");
+                    
+                    insertReservation.setInt(1, reservationCode);
+                    insertReservation.setString(2, exactResult.getString("Room"));
+
+                    insertReservation.setDate(3, java.sql.Date.valueOf(exactResult.getString("CheckIn")), java.util.Calendar.getInstance());
+                    insertReservation.setDate(4, java.sql.Date.valueOf(exactResult.getString("CheckOut")), java.util.Calendar.getInstance());
+ 
+                    insertReservation.setInt(5, exactResult.getInt("basePrice"));
+
+                    insertReservation.setString(6, ln);
+                    insertReservation.setString(7, fn);
+                    insertReservation.setInt(8, na);
+                    insertReservation.setInt(9, nc);
+                    
+                    System.out.println("Confirm the following reservation: Y/N");
+                    System.out.format("\n%-12s | %-12s | %-12s | %12s | %12s | %12s | %12s | %12s | %12s\n",
+                        "CODE", "Room", "CheckIn", "Checkout", "Rate", "LastName", "FirstName", "Adults", "Kids");
+
+                    System.out.format("\n%-12d | %-12s | %-12s | %12s | %12d | %12s | %12s | %12d | %12d\n",
+                    reservationCode, exactResult.getString("Room"), exactResult.getString("CheckIn"), exactResult.getString("CheckOut"), exactResult.getInt("basePrice"), ln, fn, na, nc);
+                    String selection2 = scan.next();
+
+                    int updated = 0;
+                    if (selection2.toUpperCase().equals("Y") || selection2.toUpperCase().equals("YES")) 
+                    {
+                        updated = insertReservation.executeUpdate(); 
+                    }
+                    if (updated == 1)
+                    {
+                        dbConnection.rollback();
+                    }
+                    else
+                    {
+                        dbConnection.rollback();
+                    }
+                }
+                else 
+                {
+                    System.out.println("Invalid Selection");
+                    return;
+                }
             }
             // if there is no exact result, get the fuzzy result
             else 
             {
+                System.out.println("No rooms match your request exactly, here are some similar available bookings:");
                 // Prepare fuzzyQuery
                 PreparedStatement fuzzyQuery = dbConnection.prepareStatement(sqlBase + sqlFuzzy);
                 for (int i = 0; i < 25; i+=4)
@@ -420,6 +480,7 @@ public class InnReservations {
                 ResultSet fuzzyResult = fuzzyQuery.executeQuery();
 
                 int index = 1;
+                System.out.format("\n%-12s | %-12s | %-12s | %12s | %12s\n", "Listing #", "Room Code", "Available From", "Available To", "Bed Type");
                 while (fuzzyResult.next())
                 {
                     String room = fuzzyResult.getString("Room");
@@ -428,8 +489,61 @@ public class InnReservations {
                     int priority = fuzzyResult.getInt("Priority");
                     String bedType = fuzzyResult.getString("bedType");
 
-                    System.out.format("\n%-12d | %-12s | %-12s | %12s | %12d | %12s\n", index, room, checkIn, checkOut, priority, bedType);
+                    System.out.format("\n%-12d | %-12s | %-12s | %12s | %12s\n", index, room, checkIn, checkOut, bedType);
                     index += 1;
+                }
+
+
+                System.out.println("Select the desired booking by listing #, enter 0 to cancel");
+                int selection = scan.nextInt();
+                if (selection == 0)
+                {
+                    return;
+                }
+                else if (fuzzyResult.absolute(selection))
+                {
+                    int reservationCode = ((int)(Math.random() * ((1000000000 - 10000000) + 1)) + 10000000);
+                    PreparedStatement insertReservation = dbConnection.prepareStatement("insert into lab7_reservations (CODE, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) value ( ?, ?, ?, ?, ?, ?, ?, ?, ? );");
+                    
+                    insertReservation.setInt(1, reservationCode);
+                    insertReservation.setString(2, fuzzyResult.getString("Room"));
+
+                    insertReservation.setDate(3, java.sql.Date.valueOf(fuzzyResult.getString("CheckIn")), java.util.Calendar.getInstance());
+                    insertReservation.setDate(4, java.sql.Date.valueOf(fuzzyResult.getString("CheckOut")), java.util.Calendar.getInstance());
+ 
+                    insertReservation.setInt(5, fuzzyResult.getInt("basePrice"));
+
+                    insertReservation.setString(6, ln);
+                    insertReservation.setString(7, fn);
+                    insertReservation.setInt(8, na);
+                    insertReservation.setInt(9, nc);
+                    
+                    System.out.println("Confirm the following reservation: Y/N");
+                    System.out.format("\n%-12s | %-12s | %-12s | %12s | %12s | %12s | %12s | %12s | %12s\n",
+                        "CODE", "Room", "CheckIn", "Checkout", "Rate", "LastName", "FirstName", "Adults", "Kids");
+
+                    System.out.format("\n%-12d | %-12s | %-12s | %12s | %12d | %12s | %12s | %12d | %12d\n",
+                    reservationCode, fuzzyResult.getString("Room"), fuzzyResult.getString("CheckIn"), fuzzyResult.getString("CheckOut"), fuzzyResult.getInt("basePrice"), ln, fn, na, nc);
+                    String selection2 = scan.next();
+
+                    int updated = 0;
+                    if (selection2.toUpperCase().equals("Y") || selection2.toUpperCase().equals("YES")) 
+                    {
+                        updated = insertReservation.executeUpdate(); 
+                    }
+                    if (updated == 1)
+                    {
+                        dbConnection.rollback();
+                    }
+                    else
+                    {
+                        dbConnection.rollback();
+                    }
+                }
+                else 
+                {
+                    System.out.println("Invalid Selection");
+                    return;
                 }
             }
             
