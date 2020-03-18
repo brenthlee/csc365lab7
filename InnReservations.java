@@ -327,7 +327,7 @@ public class InnReservations {
                         updated = insertReservation.executeUpdate();
                     }
                     if (updated == 1) {
-                        dbConnection.rollback();
+                        dbConnection.commit();
                     } else {
                         dbConnection.rollback();
                     }
@@ -415,7 +415,7 @@ public class InnReservations {
                         updated = insertReservation.executeUpdate();
                     }
                     if (updated == 1) {
-                        dbConnection.rollback();
+                        dbConnection.commit();
                     } else {
                         dbConnection.rollback();
                     }
@@ -686,7 +686,7 @@ public class InnReservations {
                             + String.valueOf(reservationCode));
 
                     // change to commit when testing is done
-                    dbConnection.rollback();
+                    dbConnection.commit();
                 } catch (SQLException e) {
                     dbConnection.rollback();
                     dbConnection.close();
