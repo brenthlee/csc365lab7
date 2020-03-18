@@ -38,7 +38,7 @@ public class InnReservations {
     }
 
     public void prompt() throws SQLException {
-        funcReq2();
+        funcReq6();
         System.exit(0);
         // int choice = -1;
         // String statement = "";
@@ -877,7 +877,7 @@ public class InnReservations {
             }
             
 
-            String searchSql = "SELECT * FROM lab7_reservations, lab7_rooms WHERE RoomCode = Room AND FirstName like ? AND LastName like ? AND Room like ? AND Code like ? AND CheckIn BETWEEN ? AND ? AND CheckOut BETWEEN ? AND ?";
+            String searchSql = "SELECT * FROM lab7_reservations, lab7_rooms WHERE RoomCode = Room AND FirstName like ? AND LastName like ? AND Room like ? AND Code like ? AND CheckIn <= ? AND ? < CheckOut";
 
             // Step 3: Start transaction
             dbConnection.setAutoCommit(false);
@@ -889,8 +889,8 @@ public class InnReservations {
                 pstmt.setString(2, lname);
                 pstmt.setString(3, rcode);
                 pstmt.setString(4, rescode);
-                pstmt.setDate(5, java.sql.Date.valueOf(sdate));
-                pstmt.setDate(6, java.sql.Date.valueOf(edate));
+                pstmt.setDate(5, java.sql.Date.valueOf(edate));
+                pstmt.setDate(6, java.sql.Date.valueOf(sdate));
                 ResultSet resInfoResult = pstmt.executeQuery();
                 
                 
