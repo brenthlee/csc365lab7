@@ -12,8 +12,6 @@ public class InnReservations {
     static final String rooms = "blee96.lab7_rooms";
     static final String reservations = "blee96.lab7_reservations";
 
-    int globalUniqueCounter = 0;
-
     public static void main(String[] args) throws SQLException {
         try {
             InnReservations IR = new InnReservations();
@@ -38,40 +36,50 @@ public class InnReservations {
     }
 
     public void prompt() throws SQLException {
-        funcReq6();
+        // funcReq6();
+        
+        int choice = -1;
+        String input = "";
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Welcome to the inn reservation system");
+        System.out.println("Press 1 to view Rooms and Rates");
+        System.out.println("Press 2 to make a Reservation");
+        System.out.println("Press 3 to edit an existing Reservation");
+        System.out.println("Press 4 to cancel a Reservation");
+        System.out.println("Press 5 to see detailed reservation information");
+        System.out.println("Press 6 to see an Overview of Revenue");
+        System.out.println("Press 0 to quit\n");
+
+        while (choice != 0) {
+            System.out.print("choice: ");
+
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+
+                if (choice >= 0 && choice <= 6) {
+                    if (choice == 1)      { funcReq1(); }
+                    else if (choice == 2) { funcReq2(); }
+                    else if (choice == 3) { funcReq3(); }
+                    else if (choice == 4) { funcReq4(); }
+                    else if (choice == 5) { funcReq5(); }
+                    else if (choice == 6) { funcReq6(); }
+                    else if (choice == 0) {
+                        System.out.println("Thank you! See you next time!");
+                        System.exit(0);
+                    }
+                }
+                else {
+                    System.out.println("Please enter a valid command: 1-6 or 0 to quit!");
+                }
+            }
+            else {
+                System.out.println("Please enter a valid command: 1-6 or 0 to quit!");
+                scanner.next();
+            }
+        }
+        System.out.println("Goodbye");
         System.exit(0);
-        // int choice = -1;
-        // String statement = "";
-        // Scanner scanner = new Scanner(System.in);
-        // System.out.println("Press 1 to view Rooms and Rates");
-        // System.out.println("Press 2 to make a Reservation");
-        // System.out.println("Press 3 to edit an existing Reservation");
-        // System.out.println("Press 4 to cancel a Reservation");
-        // System.out.println("Press 5 to see detailed reservation information");
-        // System.out.println("Press 6 to see an Overview of Revenue");
-        // System.out.println("Press 0 to quit");
-        // System.out.println("How can we help. Please 1 a number 1-6 or 0 to quit):
-        // ");
-        // while (scanner.hasNext()) {
-        // if (scanner.hasNextInt() && ((choice = scanner.nextInt()) >= 0) && choice <=
-        // 6) {
-        // if (choice == 1) {
-        // } else if (choice == 2) {
-        // } else if (choice == 3) {
-        // } else if (choice == 4) {
-        // } else if (choice == 5) {
-        // } else if (choice == 6) {
-        // } else if (choice == 0) {
-        // System.out.println("Thank you! See you next time!");
-        // System.exit(1);
-        // }
-        // } else {
-        //
-        // }
-        // System.out.println("Please enter a valid command: 1-6 or 0 to quit!");
-        // scanner.next();
-        // }
-        // choice = scanner.nextInt();
     }
 
     public void funcReq1() throws SQLException {
@@ -815,7 +823,7 @@ public class InnReservations {
     }
 
     // Detailed Reservation Information
-    public void funcReq5() throws SQLException {
+    public void funcReq5() throws SQLException, IllegalArgumentException {
         String tempInput = "";
         
         // Step 1: Establish connection to RDBMS
@@ -909,6 +917,9 @@ public class InnReservations {
             } catch (SQLException e) {
                 dbConnection.rollback();
             }
+            catch (IllegalArgumentException e){
+                System.out.println("ill-formatted input!\n");
+            }
 
         }
         // Step 7: Close connection (handled implcitly by try-with-resources syntax)
@@ -995,6 +1006,7 @@ public class InnReservations {
             } catch (SQLException e) {
                 dbConnection.rollback();
             }
+
 
         }
         // Step 7: Close connection (handled implcitly by try-with-resources syntax)
