@@ -38,7 +38,7 @@ public class InnReservations {
     }
 
     public void prompt() throws SQLException {
-        funcReq2();
+        funcReq6();
         System.exit(0);
         // int choice = -1;
         // String statement = "";
@@ -868,7 +868,7 @@ public class InnReservations {
             }
             
 
-            String searchSql = "SELECT * FROM lab7_reservations, lab7_rooms WHERE RoomCode = Room AND FirstName like ? AND LastName like ? AND Room like ? AND Code like ? AND CheckIn BETWEEN ? AND ? AND CheckOut BETWEEN ? AND ?";
+            String searchSql = "SELECT * FROM lab7_reservations, lab7_rooms WHERE RoomCode = Room AND FirstName like ? AND LastName like ? AND Room like ? AND Code like ? AND CheckIn <= ? AND ? < CheckOut";
 
             // Step 3: Start transaction
             dbConnection.setAutoCommit(false);
@@ -880,8 +880,8 @@ public class InnReservations {
                 pstmt.setString(2, lname);
                 pstmt.setString(3, rcode);
                 pstmt.setString(4, rescode);
-                pstmt.setDate(5, java.sql.Date.valueOf(sdate));
-                pstmt.setDate(6, java.sql.Date.valueOf(edate));
+                pstmt.setDate(5, java.sql.Date.valueOf(edate));
+                pstmt.setDate(6, java.sql.Date.valueOf(sdate));
                 ResultSet resInfoResult = pstmt.executeQuery();
                 
                 
@@ -921,25 +921,28 @@ public class InnReservations {
         try (Connection dbConnection = DriverManager.getConnection(url, name, pass)) {
 
             // Step 2: Construct SQL statement
-            String RevenueSql = "with a as( " +
-                                    "select room, MONTH(CheckIn) as month, count(*) as reservations, round(sum(DATEDIFF(Checkout, CheckIn) * Rate),0) AS TotalCharge " +
-                                    "from lab7_reservations " +
-                                    "group by room, month ) " +
-                                "select IFNULL(room, 'totals') AS room, " +
-                                "SUM(CASE WHEN month = 1 THEN TotalCharge END) January, " +
-                                "SUM(CASE WHEN month = 2 THEN TotalCharge END) Febuary, " +
-                                "SUM(CASE WHEN month = 3 THEN TotalCharge END) March, " +
-                                "SUM(CASE WHEN month = 4 THEN TotalCharge END) April, " +
-                                "SUM(CASE WHEN month = 5 THEN TotalCharge END) May, " +
-                                "SUM(CASE WHEN month = 6 THEN TotalCharge END) June, " +
-                                "SUM(CASE WHEN month = 7 THEN TotalCharge END) July, " +
-                                "SUM(CASE WHEN month = 8 THEN TotalCharge END) August, " +
-                                "SUM(CASE WHEN month = 9 THEN TotalCharge END) September, " +
-                                "SUM(CASE WHEN month = 10 THEN TotalCharge END) October, " +
-                                "SUM(CASE WHEN month = 11 THEN TotalCharge END) November, " +
-                                "SUM(CASE WHEN month = 12 THEN TotalCharge END) December " +
-                                "from a " +
-                                "group by room WITH ROLLUP";
+            String RevenueSql = "with b as ( " +
+                                    "with a as( " +
+                                        "select room, MONTH(CheckIn) as month, count(*) as reservations, round(sum(DATEDIFF(Checkout, CheckIn) * Rate),0) AS TotalCharge " +
+                                        "from lab7_reservations " +
+                                        "group by room, month ) " +
+                                    "select IFNULL(room, 'totals') AS room, " +
+                                    "SUM(CASE WHEN month = 1 THEN TotalCharge END) January, " +
+                                    "SUM(CASE WHEN month = 2 THEN TotalCharge END) Febuary, " +
+                                    "SUM(CASE WHEN month = 3 THEN TotalCharge END) March, " +
+                                    "SUM(CASE WHEN month = 4 THEN TotalCharge END) April, " +
+                                    "SUM(CASE WHEN month = 5 THEN TotalCharge END) May, " +
+                                    "SUM(CASE WHEN month = 6 THEN TotalCharge END) June, " +
+                                    "SUM(CASE WHEN month = 7 THEN TotalCharge END) July, " +
+                                    "SUM(CASE WHEN month = 8 THEN TotalCharge END) August, " +
+                                    "SUM(CASE WHEN month = 9 THEN TotalCharge END) September, " +
+                                    "SUM(CASE WHEN month = 10 THEN TotalCharge END) October, " +
+                                    "SUM(CASE WHEN month = 11 THEN TotalCharge END) November, " +
+                                    "SUM(CASE WHEN month = 12 THEN TotalCharge END) December " +
+                                    "from a " +
+                                    "group by room WITH ROLLUP) " +
+                                "select *, January + Febuary + March + April + May + June + July + August + September + October + November + December as roomtot " +
+                                "from b";
 
             // Step 3: Start transaction
             dbConnection.setAutoCommit(false);
@@ -950,7 +953,7 @@ public class InnReservations {
                 ResultSet resInfoResult = pstmt.executeQuery();
 
                 // Step 4.5 formatting outut as table
-                String roomCol = "room";
+                String roomCol = "Room";
                 String JanuaryCol = "January";
                 String febCol = "Febuary";
                 String marchcol = "March";
@@ -963,7 +966,8 @@ public class InnReservations {
                 String octCol = "October";
                 String novCol = "November";
                 String decCol = "December";
-                System.out.format("%-6s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %n", roomCol, JanuaryCol, febCol, marchcol, aprilCol, mayCol, juneCol, julyCol, augcol, septcol, octCol, novCol, decCol);
+                String roomtotcol = "Room total";
+                System.out.format("%-6s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %n", roomCol, JanuaryCol, febCol, marchcol, aprilCol, mayCol, juneCol, julyCol, augcol, septcol, octCol, novCol, decCol, roomtotcol);
 
                 
                 // Step 5: Handle results
@@ -981,8 +985,9 @@ public class InnReservations {
                     String oct = resInfoResult.getString("October");
                     String nov = resInfoResult.getString("November");
                     String dec = resInfoResult.getString("December");
+                    String tot = resInfoResult.getString("roomtot");
 
-                    System.out.format("%-6s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %n", room, jan, feb, mar, apr, may, jun, july, aug, sept, oct, nov, dec);
+                    System.out.format("%-6s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %-10s | %n", room, jan, feb, mar, apr, may, jun, july, aug, sept, oct, nov, dec, tot);
                 }
 
                 // Step 6: Commit or rollback transaction
