@@ -1,5 +1,8 @@
 import java.sql.*;
 import java.util.*;
+
+// import sun.awt.www.content.audio.x_aiff;
+
 import java.time.LocalDate;
 
 public class InnReservations {
@@ -155,33 +158,6 @@ public class InnReservations {
     }
 
     public void funcReq2() throws SQLException {
-        System.out.println("MAKE A RESERVATION");
-        Scanner scan = new Scanner(System.in);
-
-        System.out.println("Enter your first name: ");
-        String fn = scan.next();
-        System.out.println("Enter your last name: ");
-        String ln = scan.next();
-        System.out.println("Enter a room code or type Any: ");
-        String rc = scan.next();
-        System.out.println("Enter a bed type or type Any: ");
-        String bt = scan.next();
-        System.out.println("Enter a check-in date (YYYY-MM-DD): ");
-        String ci = scan.next();
-        System.out.println("Enter a check-out date (YYYY-MM-DD): ");
-        String co = scan.next();
-
-        int nc, na;
-        do {
-            System.out.println("Enter the number of children: ");
-            nc = scan.nextInt();
-            System.out.println("Enter the number of adults: ");
-            na = scan.nextInt();
-            if (nc + na > 4) {
-                System.out.println("The total number of people per reservation is 4.\nPlease break up your group and make separate reservations.");
-            }
-        } while (nc + na >  4);
-
         String sqlBase =
             "with OverlappingRooms as ( " +
                 "select distinct Room " +
@@ -334,7 +310,34 @@ public class InnReservations {
 
         String sqlFuzzy =
             "select * " +
-            "from ExactMatch;";
+            "from FuzzyMatch;";
+
+        System.out.println("MAKE A RESERVATION");
+        Scanner scan = new Scanner(System.in);
+
+        System.out.println("Enter your first name: ");
+        String fn = scan.next();
+        System.out.println("Enter your last name: ");
+        String ln = scan.next();
+        System.out.println("Enter a room code or type Any: ");
+        String rc = scan.next();
+        System.out.println("Enter a bed type or type Any: ");
+        String bt = scan.next();
+        System.out.println("Enter a check-in date (YYYY-MM-DD): ");
+        String ci = scan.next();
+        System.out.println("Enter a check-out date (YYYY-MM-DD): ");
+        String co = scan.next();
+
+        int nc, na;
+        do {
+            System.out.println("Enter the number of children: ");
+            nc = scan.nextInt();
+            System.out.println("Enter the number of adults: ");
+            na = scan.nextInt();
+            if (nc + na > 4) {
+                System.out.println("The total number of people per reservation is 4.\nPlease break up your group and make separate reservations.");
+            }
+        } while (nc + na >  4);
 
         // Step 1: Establish connection to RDBMS
         try (Connection dbConnection = DriverManager.getConnection(url, name, pass)) {
@@ -361,38 +364,75 @@ public class InnReservations {
             {
                 rc = "%";
             }
-            exactQuery.setString(43, bt.toUpperCase());
-            exactQuery.setString(44, rc.toUpperCase());
+            exactQuery.setInt(43, nc + na);
+            exactQuery.setString(44, bt.toUpperCase());
+            exactQuery.setString(45, rc.toUpperCase());
 
+            ResultSet exactResult = exactQuery.executeQuery();
+            
 
-            // Prepare exactQuery
-            PreparedStatement fuzzyQuery = dbConnection.prepareStatement(sqlBase + sqlFuzzy);
-            for (int i = 0; i < 25; i+=4)
+            // if there is an exact reult handle it
+            if (exactResult.next())
             {
-                fuzzyQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
-                fuzzyQuery.setDate(i+2, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
-                fuzzyQuery.setDate(i+3, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
-                fuzzyQuery.setDate(i+4, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
-            }
-            for (int i = 28; i < 41; i+=2)
-            {
-                fuzzyQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
-                fuzzyQuery.setDate(i+2, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
-            }
-            if (bt.toUpperCase().equals("ANY"))
-            {
-                bt = "%";
-            }
-            if (rc.toUpperCase().equals("ANY"))
-            {
-                rc = "%";
-            }
-            fuzzyQuery.setInt(43, nc + na);
-            fuzzyQuery.setString(44, bt.toUpperCase());
-            fuzzyQuery.setString(45, rc.toUpperCase());
+                int index = 1;
+                do
+                {
+                    String room = exactResult.getString("Room");
+                    String checkIn = exactResult.getString("CheckIn");
+                    String checkOut = exactResult.getString("CheckOut");
+                    int priority = exactResult.getInt("Priority");
+                    String bedType = exactResult.getString("bedType");
 
-            ResultSet exactResult = fuzzyQuery.executeQuery();
-            ResultSet fuzzyResult = fuzzyQuery.executeQuery();
+                    System.out.format("\n%-12d | %-12s | %-12s | %12s | %12d | %12s\n", index, room, checkIn, checkOut, priority, bedType);
+                    index += 1;
+                }
+                while (exactResult.next());
+            }
+            // if there is no exact result, get the fuzzy result
+            else 
+            {
+                // Prepare fuzzyQuery
+                PreparedStatement fuzzyQuery = dbConnection.prepareStatement(sqlBase + sqlFuzzy);
+                for (int i = 0; i < 25; i+=4)
+                {
+                    fuzzyQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
+                    fuzzyQuery.setDate(i+2, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
+                    fuzzyQuery.setDate(i+3, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
+                    fuzzyQuery.setDate(i+4, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
+                }
+                for (int i = 28; i < 41; i+=2)
+                {
+                    fuzzyQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
+                    fuzzyQuery.setDate(i+2, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
+                }
+                if (bt.toUpperCase().equals("ANY"))
+                {
+                    bt = "%";
+                }
+                if (rc.toUpperCase().equals("ANY"))
+                {
+                    rc = "%";
+                }
+                fuzzyQuery.setInt(43, nc + na);
+                fuzzyQuery.setString(44, bt.toUpperCase());
+                fuzzyQuery.setString(45, rc.toUpperCase());
+                
+                ResultSet fuzzyResult = fuzzyQuery.executeQuery();
+
+                int index = 1;
+                while (fuzzyResult.next())
+                {
+                    String room = fuzzyResult.getString("Room");
+                    String checkIn = fuzzyResult.getString("CheckIn");
+                    String checkOut = fuzzyResult.getString("CheckOut");
+                    int priority = fuzzyResult.getInt("Priority");
+                    String bedType = fuzzyResult.getString("bedType");
+
+                    System.out.format("\n%-12d | %-12s | %-12s | %12s | %12d | %12s\n", index, room, checkIn, checkOut, priority, bedType);
+                    index += 1;
+                }
+            }
+            
        } catch(SQLException e) {
            e.printStackTrace();
        }
