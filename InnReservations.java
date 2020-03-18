@@ -164,38 +164,31 @@ public class InnReservations {
             "with OverlappingRooms as ( " +
                 "select distinct Room " +
                 "from lab7_reservations " +
-                "where (CheckIn <  ?  and  ?  <= CheckOut) " +
-                    "or (CheckIn <  ?  and  ?  <= CheckOut) " +
+                "where (CheckIn <=  ?  and  ?  < CheckOut) " +
             "), OverlappingRooms_ShiftRight as ( " +
                 "select distinct Room " +
                 "from lab7_reservations " +
-                "where (CheckIn < date_add( ? , interval 1 day) and date_add( ? , interval 1 day) <= CheckOut) " +
-                "    or (CheckIn < date_add( ? , interval 1 day) and date_add( ? , interval 1 day) <= CheckOut) " +
+                "where (CheckIn <= date_add( ? , interval 1 day) and date_add( ? , interval 1 day) < CheckOut) " +
             "), OverlappingRooms_ShiftLeft as ( " +
                 "select distinct Room " +
                 "from lab7_reservations " +
-                "where (CheckIn < date_add( ? , interval -1 day) and date_add( ? , interval -1 day) <= CheckOut) " +
-                "    or (CheckIn < date_add( ? , interval -1 day) and date_add( ? , interval -1 day) <= CheckOut) " +
+                "where (CheckIn <= date_add( ? , interval -1 day) and date_add( ? , interval -1 day) < CheckOut) " +
             "), OverlappingRooms_ShortenEnd as ( " +
                 "select distinct Room " +
                 "from lab7_reservations " +
-                "where (CheckIn <  ?  and  ?  < CheckOut) " +
-                "    or (CheckIn < date_add( ? , interval -1 day) and date_add( ? , interval -1 day) <= CheckOut) " +
+                "where (CheckIn <= date_add( ? , interval -1 day) and ? < CheckOut) " +
             "), OverlappingRooms_ShortenStart as ( " +
                 "select distinct Room " +
                 "from lab7_reservations " +
-                "where (CheckIn < date_add( ? , interval 1 day) and date_add( ? , interval 1 day) <= CheckOut) " +
-                "    or (CheckIn <  ?  and  ?  < CheckOut) " +
+                "where (CheckIn <= ? and date_add( ? , interval 1 day) < CheckOut) " +
             "), OverlappingRooms_ShiftRightTwo as ( " +
                 "select distinct Room " +
                 "from lab7_reservations " +
-                "where (CheckIn < date_add( ? , interval 2 day) and date_add( ? , interval 2 day) <= CheckOut) " +
-                "    or (CheckIn < date_add( ? , interval 2 day) and date_add( ? , interval 2 day) <= CheckOut) " +
+                "where (CheckIn <= date_add( ? , interval 2 day) and date_add( ? , interval 2 day) < CheckOut) " +
             "), OverlappingRooms_ShiftLeftTwo as ( " +
                 "select distinct Room " +
                 "from lab7_reservations " +
-                "where (CheckIn < date_add( ? , interval -2 day) and date_add( ? , interval -2 day) <= CheckOut) " +
-                "    or (CheckIn < date_add( ? , interval -2 day) and date_add( ? , interval -2 day) <= CheckOut) " +
+                "where (CheckIn <= date_add( ? , interval -2 day) and date_add( ? , interval -2 day) < CheckOut) " +
             "), AvailableRooms as ( " +
                 "select RoomCode as Room, " +
                     " ?  as CheckIn, " +
@@ -349,14 +342,12 @@ public class InnReservations {
             
             // Prepare exactQuery
             PreparedStatement exactQuery = dbConnection.prepareStatement(sqlBase + sqlExact);
-            for (int i = 0; i < 25; i+=4)
+            for (int i = 0; i < 13; i+=2)
             {
-                exactQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
+                exactQuery.setDate(i+1, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
                 exactQuery.setDate(i+2, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
-                exactQuery.setDate(i+3, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
-                exactQuery.setDate(i+4, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
             }
-            for (int i = 28; i < 41; i+=2)
+            for (int i = 14; i < 27; i+=2)
             {
                 exactQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
                 exactQuery.setDate(i+2, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
@@ -369,9 +360,9 @@ public class InnReservations {
             {
                 rc = "%";
             }
-            exactQuery.setInt(43, nc + na);
-            exactQuery.setString(44, bt.toUpperCase());
-            exactQuery.setString(45, rc.toUpperCase());
+            exactQuery.setInt(29, nc + na);
+            exactQuery.setString(30, bt.toUpperCase());
+            exactQuery.setString(31, rc.toUpperCase());
 
             ResultSet exactResult = exactQuery.executeQuery();
             
@@ -451,16 +442,15 @@ public class InnReservations {
             else 
             {
                 System.out.println("No rooms match your request exactly, here are some similar available bookings:");
-                // Prepare fuzzyQuery
+                
+                // Prepare exactQuery
                 PreparedStatement fuzzyQuery = dbConnection.prepareStatement(sqlBase + sqlFuzzy);
-                for (int i = 0; i < 25; i+=4)
+                for (int i = 0; i < 13; i+=2)
                 {
-                    fuzzyQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
+                    fuzzyQuery.setDate(i+1, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
                     fuzzyQuery.setDate(i+2, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
-                    fuzzyQuery.setDate(i+3, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
-                    fuzzyQuery.setDate(i+4, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
                 }
-                for (int i = 28; i < 41; i+=2)
+                for (int i = 14; i < 27; i+=2)
                 {
                     fuzzyQuery.setDate(i+1, java.sql.Date.valueOf(ci), java.util.Calendar.getInstance());
                     fuzzyQuery.setDate(i+2, java.sql.Date.valueOf(co), java.util.Calendar.getInstance());
@@ -473,9 +463,10 @@ public class InnReservations {
                 {
                     rc = "%";
                 }
-                fuzzyQuery.setInt(43, nc + na);
-                fuzzyQuery.setString(44, bt.toUpperCase());
-                fuzzyQuery.setString(45, rc.toUpperCase());
+                fuzzyQuery.setInt(29, nc + na);
+                fuzzyQuery.setString(30, bt.toUpperCase());
+                fuzzyQuery.setString(31, rc.toUpperCase());
+
                 
                 ResultSet fuzzyResult = fuzzyQuery.executeQuery();
 
