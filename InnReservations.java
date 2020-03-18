@@ -167,7 +167,7 @@ public class InnReservations {
         System.out.println("");
     }
 
-    public void funcReq2() throws SQLException {
+    public void funcReq2() throws SQLException, IllegalArgumentException {
         String sqlBase =
             "with OverlappingRooms as ( " +
                 "select distinct Room " +
@@ -335,9 +335,19 @@ public class InnReservations {
         int nc, na;
         do {
             System.out.println("Enter the number of children: ");
-            nc = scan.nextInt();
+            try {
+                nc = scan.nextInt();
+            } catch (Exception e) {
+                nc = 100;
+                scan.next();
+            }
             System.out.println("Enter the number of adults: ");
-            na = scan.nextInt();
+            try {
+                na = scan.nextInt();
+            } catch (Exception e) {
+                na = 100;
+                scan.next();
+            }
             if (nc + na > 4) {
                 System.out.println("The total number of people per reservation is 4.\nPlease break up your group and make separate reservations.");
             }
@@ -549,6 +559,9 @@ public class InnReservations {
        } catch(SQLException e) {
            e.printStackTrace();
        }
+       catch (IllegalArgumentException e){
+        System.out.println("The date format is not correct, please try again and input a correctly formatted date\n");
+        }
     }
 
     // update reservation
